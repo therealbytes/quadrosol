@@ -9,7 +9,7 @@ contract BenchInsert is Bench {
     using QuadTreeLib for QuadTree;
 
     function action() internal override {
-        tree.insert(Point(-1, -1));
+        insertMany(-32, 0);
     }
 
     function logResult(uint256 gas) internal override {

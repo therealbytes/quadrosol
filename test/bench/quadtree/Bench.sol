@@ -22,7 +22,11 @@ contract Bench is Test {
     }
 
     function insertMany(uint256 n) internal {
-        for (uint256 i = 0; i < n; i++) {
+        insertMany(0, int256(n));
+    }
+
+    function insertMany(int256 a, int256 b) internal {
+        for (int256 i = a; i < b; i++) {
             tree.insert(Point(int32(int256(i)), int32(int256(i))));
         }
     }
