@@ -13,7 +13,7 @@ struct Node {
 struct QuadTree {
     Node root;
     Rect rect;
-    uint256 size;
+    uint256 _size;
 }
 
 library NodeLib {
@@ -148,6 +148,10 @@ library QuadTreeLib {
     using RectLib for Rect;
     using NodeLib for Node;
 
+    function size(QuadTree storage qt) public view returns (uint256) {
+        return qt._size;
+    }
+
     function insert(QuadTree storage qt, Point memory point)
         internal
         returns (bool)
@@ -156,7 +160,7 @@ library QuadTreeLib {
             return false;
         }
         if (qt.root.insert(qt.rect, point)) {
-            qt.size++;
+            qt._size++;
             return true;
         }
         return false;
@@ -170,7 +174,7 @@ library QuadTreeLib {
             return false;
         }
         if (qt.root.remove(qt.rect, point)) {
-            qt.size--;
+            qt._size--;
             return true;
         }
         return false;

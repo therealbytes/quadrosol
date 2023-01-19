@@ -2,11 +2,10 @@
 pragma solidity >=0.8.0;
 
 import "forge-std/Test.sol";
-import "../../src/QuadTree.sol";
 
 import "./Bench.sol";
 
-contract BenchRemove is Bench {
+contract BenchSearchRect is Bench {
     using QuadTreeLib for QuadTree;
     bytes32 internal rnd;
 
@@ -29,10 +28,7 @@ contract BenchRemove is Bench {
     function precheck() internal override {}
 
     function action() internal override {
-        Point[] memory points = tree.searchRect(
-            Rect(Point(25, 25), Point(75, 75))
-        );
-        console.log("Found %d points", points.length);
+        tree.searchRect(Rect(Point(25, 25), Point(75, 75)));
     }
 
     function logResult(uint256 gas) internal override {

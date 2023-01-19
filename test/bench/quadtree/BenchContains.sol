@@ -2,19 +2,18 @@
 pragma solidity >=0.8.0;
 
 import "forge-std/Test.sol";
-import "../../src/QuadTree.sol";
 
 import "./Bench.sol";
 
-contract BenchInsert is Bench {
+contract BenchContains is Bench {
     using QuadTreeLib for QuadTree;
 
     function action() internal override {
-        tree.insert(Point(-1, -1));
+        tree.contains(Point(-1, -1));
     }
 
     function logResult(uint256 gas) internal override {
-        console.log("Benchmark-Insert-%d: %d", n(), gas);
+        console.log("Benchmark-Contains-%d: %d", n(), gas);
     }
 
     function n() internal view virtual override returns (uint256) {
@@ -22,25 +21,25 @@ contract BenchInsert is Bench {
     }
 }
 
-contract BenchInsert1 is BenchInsert {
+contract BenchContains1 is BenchContains {
     function n() internal view override returns (uint256) {
         return 1;
     }
 }
 
-contract BenchInsert10 is BenchInsert {
+contract BenchContains10 is BenchContains {
     function n() internal view override returns (uint256) {
         return 10;
     }
 }
 
-contract BenchInsert100 is BenchInsert {
+contract BenchContains100 is BenchContains {
     function n() internal view override returns (uint256) {
         return 100;
     }
 }
 
-contract BenchInsert1000 is BenchInsert {
+contract BenchContains1000 is BenchContains {
     function n() internal view override returns (uint256) {
         return 1000;
     }

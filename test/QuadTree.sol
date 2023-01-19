@@ -46,6 +46,7 @@ contract QuadTreeTest is Test {
             Rect(Point(-1, -1), Point(2, 2))
         );
         assertEq(points.length, 2);
+        // Note: this make assumptions about the order of the points
         assertEq(points[0], pIn0);
         assertEq(points[1], pIn1);
     }

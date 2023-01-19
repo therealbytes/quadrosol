@@ -92,4 +92,10 @@ library RectLib {
             }
         }
     }
+
+    function area(Rect memory rect) internal pure returns (uint256) {
+        return
+            uint256(int256(rect.max.x - rect.min.x)) *
+            uint256(int256(rect.max.y - rect.min.y));
+    }
 }

@@ -40,6 +40,12 @@ contract Set is Ownable {
         return (true, itemToIndex[item]);
     }
 
+    function getItem(uint256 index) public view returns (bool, uint256) {
+        if (index >= items.length) return (false, 0);
+
+        return (true, items[index]);
+    }
+
     function has(uint256 item) public view returns (bool) {
         if (items.length == 0) return false;
         if (itemToIndex[item] == 0) return items[0] == item;

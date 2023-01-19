@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0;
 
 import "forge-std/Test.sol";
-import "../../src/QuadTree.sol";
+import "../../../src/QuadTree.sol";
 
 contract Bench is Test {
     using QuadTreeLib for QuadTree;
@@ -28,7 +28,7 @@ contract Bench is Test {
     }
 
     function precheck() internal virtual {
-        assertEq(tree.size, n());
+        assertEq(tree.size(), n());
     }
 
     function action() internal virtual {
