@@ -194,16 +194,33 @@ library QuadTreeLib {
         QuadTree storage qt,
         Rect memory rect
     ) internal view returns (Point[] memory) {
-        Point[] memory tracer = new Point[](0);
+
+        Point[] memory points;
+
         if (!qt.rect.intersects(rect)) {
-            return tracer;
+            return points;
         }
-        uint256 count = qt.root.searchRect(qt.rect, rect, tracer, 0);
-        if (count == 0) {
-            return tracer;
+
+        points = new Point[](qt._size);
+        uint256 count = qt.root.searchRect(qt.rect, rect, points, 0);
+
+        assembly {
+            // resize array
+            mstore(points, count)
         }
-        Point[] memory points = new Point[](count);
-        qt.root.searchRect(qt.rect, rect, points, 0);
+
         return points;
+
+        // Point[] memory tracer = new Point[](0);
+        // if (!qt.rect.intersects(rect)) {
+        //     return tracer;
+        // }
+        // uint256 count = qt.root.searchRect(qt.rect, rect, tracer, 0);
+        // if (count == 0) {
+        //     return tracer;
+        // }
+        // Point[] memory points = new Point[](count);
+        // qt.root.searchRect(qt.rect, rect, points, 0);
+        // return points;
     }
 }
