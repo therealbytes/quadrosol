@@ -1,58 +1,36 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import "forge-std/Test.sol";
-import "../src/QuadTree.sol";
+import "./Test.sol";
 
-contract QuadTreeTest is Test {
+import {Point, Rect, QuadTree, QuadTreeLib} from "../src/QuadTree.sol";
+
+contract QuadTreeTest is ObjTest {
     using QuadTreeLib for QuadTree;
 
     QuadTree internal tree;
 
-    function setUp() public {
-        tree.rect = Rect(Point(-10, -10), Point(10, 10));
+    function setRect(Rect memory rect) internal override {
+        tree.rect = rect;
     }
 
-    function testInsert() public {
-        Point memory point = Point(0, 0);
-        assertTrue(tree.insert(point));
-        assertFalse(tree.insert(point));
+    function insert(Point memory point) internal override returns (bool) {
+        return tree.insert(point);
     }
 
-    function testRemove() public {
-        Point memory point = Point(0, 0);
-        assertTrue(tree.insert(point));
-        assertTrue(tree.remove(point));
-        assertFalse(tree.remove(point));
+    function remove(Point memory point) internal override returns (bool) {
+        return tree.remove(point);
     }
 
-    function testContains() public {
-        Point memory point = Point(0, 0);
-        assertFalse(tree.contains(point));
-        assertTrue(tree.insert(point));
-        assertTrue(tree.contains(point));
+    function contains(Point memory point) internal override returns (bool) {
+        return tree.contains(point);
     }
 
-    function testSearchRect() public {
-        Point memory pIn0 = Point(0, 0);
-        Point memory pIn1 = Point(1, 1);
-        Point memory pOut0 = Point(5, 5);
-        Point memory pOut1 = Point(-5, -5);
-        assertTrue(tree.insert(pIn0));
-        assertTrue(tree.insert(pIn1));
-        assertTrue(tree.insert(pOut0));
-        assertTrue(tree.insert(pOut1));
-        Point[] memory points = tree.searchRect(
-            Rect(Point(-1, -1), Point(2, 2))
-        );
-        assertEq(points.length, 2);
-        // Note: this make assumptions about the order of the points
-        assertEq(points[0], pIn0);
-        assertEq(points[1], pIn1);
-    }
-
-    function assertEq(Point memory a, Point memory b) internal {
-        assertEq(a.x, b.x);
-        assertEq(a.y, b.y);
+    function searchRect(Rect memory rect)
+        internal
+        override
+        returns (Point[] memory)
+    {
+        return tree.searchRect(rect);
     }
 }
