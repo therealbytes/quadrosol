@@ -22,6 +22,16 @@ abstract contract BenchUtils {
         }
     }
 
+    function populateSquare(uint256 side) internal {
+        for (uint256 i = 0; i < n(); i++) {
+            Point memory point = Point(
+                int32(int256(randomUint(side))),
+                int32(int256(randomUint(side)))
+            );
+            insert(point);
+        }
+    }
+
     function testAction() public {
         precheck();
         uint256 gasLeft = gasleft();

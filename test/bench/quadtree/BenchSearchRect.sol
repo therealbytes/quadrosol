@@ -8,23 +8,21 @@ contract BenchSearchRect5 is Bench {
 
     function setUp() public virtual override {
         super.setUp();
-        for (uint256 i = 0; i < n(); i++) {
-            Point memory point = Point(
-                int32(int256(randomUint(10))),
-                int32(int256(randomUint(10)))
-            );
-            tree.insert(point);
-        }
+        populateSquare(side());
     }
+
+    function precheck() internal override {}
 
     function action() internal virtual override {
         tree.searchRect(Rect(Point(2, 2), Point(7, 7)));
     }
 
-    function precheck() internal override {}
+    function side() internal view virtual returns (uint256) {
+        return 10;
+    }
 
     function n() internal view virtual override returns (uint256) {
-        return 50;
+        return 50; // 50% full
     }
 
     function logResult(uint256 gas) internal override {
@@ -32,25 +30,34 @@ contract BenchSearchRect5 is Bench {
     }
 }
 
-contract BenchSearchRect50 is BenchSearchRect5 {
+contract BenchSearchRect16 is BenchSearchRect5 {
     using QuadTreeLib for QuadTree;
 
-    function setUp() public override {
-        Bench.setUp();
-        for (uint256 i = 0; i < n(); i++) {
-            Point memory point = Point(
-                int32(int256(randomUint(100))),
-                int32(int256(randomUint(100)))
-            );
-            tree.insert(point);
-        }
+    function action() internal override {
+        tree.searchRect(Rect(Point(32, 32), Point(48, 48)));
     }
+
+    function side() internal view virtual override returns (uint256) {
+        return 128;
+    }
+
+    function n() internal view virtual override returns (uint256) {
+        return 512; // 2% full
+    }
+}
+
+contract BenchSearchRect50 is BenchSearchRect5 {
+    using QuadTreeLib for QuadTree;
 
     function action() internal override {
         tree.searchRect(Rect(Point(25, 25), Point(75, 75)));
     }
 
+    function side() internal view virtual override returns (uint256) {
+        return 100;
+    }
+
     function n() internal view virtual override returns (uint256) {
-        return 1000;
+        return 1000; // 10% full
     }
 }
