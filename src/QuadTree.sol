@@ -21,7 +21,7 @@ library NodeLib {
 
     uint256 internal constant NODE_POINTS = 4;
 
-    function isLeaf(Node storage node) internal view returns (bool) {
+    function isLeaf(Node storage node) public view returns (bool) {
         return !node.isInternal;
     }
 
@@ -29,7 +29,7 @@ library NodeLib {
         Node storage node,
         Rect memory rect,
         Point memory point
-    ) internal returns (bool) {
+    ) public returns (bool) {
         if (isLeaf(node)) {
             for (uint256 i = 0; i < node.points.length; i++) {
                 if (
@@ -49,7 +49,7 @@ library NodeLib {
         }
     }
 
-    function subdivide(Node storage node, Rect memory rect) internal {
+    function subdivide(Node storage node, Rect memory rect) public {
         node.isInternal = true;
         for (uint256 i = 0; i < node.points.length; i++) {
             insert(node, rect, node.points[i]);
@@ -61,7 +61,7 @@ library NodeLib {
         Node storage node,
         Rect memory rect,
         Point memory point
-    ) internal returns (bool) {
+    ) public returns (bool) {
         if (isLeaf(node)) {
             for (uint256 i = 0; i < node.points.length; i++) {
                 if (
@@ -84,7 +84,7 @@ library NodeLib {
         Node storage node,
         Rect memory rect,
         Point memory point
-    ) internal view returns (bool) {
+    ) public view returns (bool) {
         if (isLeaf(node)) {
             for (uint256 i = 0; i < node.points.length; i++) {
                 if (
@@ -106,7 +106,7 @@ library NodeLib {
         Rect memory queryRect,
         Point[] memory points,
         uint256 count
-    ) internal view returns (uint256) {
+    ) public view returns (uint256) {
         if (isLeaf(node)) {
             for (uint256 i = 0; i < node.points.length; i++) {
                 if (queryRect.contains(node.points[i])) {
@@ -155,7 +155,7 @@ library QuadTreeLib {
     function insert(
         QuadTree storage qt,
         Point memory point
-    ) internal returns (bool) {
+    ) public returns (bool) {
         if (!qt.rect.contains(point)) {
             return false;
         }
@@ -169,7 +169,7 @@ library QuadTreeLib {
     function remove(
         QuadTree storage qt,
         Point memory point
-    ) internal returns (bool) {
+    ) public returns (bool) {
         if (!qt.rect.contains(point)) {
             return false;
         }
@@ -183,7 +183,7 @@ library QuadTreeLib {
     function contains(
         QuadTree storage qt,
         Point memory point
-    ) internal view returns (bool) {
+    ) public view returns (bool) {
         if (!qt.rect.contains(point)) {
             return false;
         }
@@ -193,7 +193,7 @@ library QuadTreeLib {
     function searchRect(
         QuadTree storage qt,
         Rect memory rect
-    ) internal view returns (Point[] memory) {
+    ) public view returns (Point[] memory) {
 
         Point[] memory points;
 

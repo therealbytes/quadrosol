@@ -12,12 +12,12 @@ struct SpatialSet {
 library SpatialSetLib {
     using RectLib for Rect;
 
-    function size(SpatialSet storage ss) external view returns (uint256) {
+    function size(SpatialSet storage ss) public view returns (uint256) {
         return ss.set.size();
     }
 
     function insert(SpatialSet storage ss, Point memory point)
-        external
+        public
         returns (bool)
     {
         if (!ss.rect.contains(point)) {
@@ -32,7 +32,7 @@ library SpatialSetLib {
     }
 
     function remove(SpatialSet storage ss, Point memory point)
-        external
+        public
         returns (bool)
     {
         uint256 data = encodePoint(point);
@@ -44,7 +44,7 @@ library SpatialSetLib {
     }
 
     function contains(SpatialSet storage ss, Point memory point)
-        external
+        public
         view
         returns (bool)
     {
@@ -52,7 +52,7 @@ library SpatialSetLib {
     }
 
     function searchRect(SpatialSet storage ss, Rect memory rect)
-        external
+        public
         view
         returns (Point[] memory)
     {

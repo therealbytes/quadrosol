@@ -22,7 +22,7 @@ library RectLib {
     function contains(
         Rect memory rect,
         Point memory point
-    ) internal pure returns (bool) {
+    ) public pure returns (bool) {
         return
             rect.min.x <= point.x &&
             point.x < rect.max.x &&
@@ -34,7 +34,7 @@ library RectLib {
     function intersects(
         Rect memory rect,
         Rect memory other
-    ) internal pure returns (bool) {
+    ) public pure returns (bool) {
         return
             rect.min.x < other.max.x &&
             other.min.x < rect.max.x &&
@@ -45,7 +45,7 @@ library RectLib {
     function quadrant(
         Rect memory rect,
         Quadrant quad
-    ) internal pure returns (Rect memory) {
+    ) public pure returns (Rect memory) {
         int32 midX = (rect.min.x + rect.max.x) / 2;
         int32 midY = (rect.min.y + rect.max.y) / 2;
         if (quad == Quadrant.TOP_LEFT) {
@@ -71,7 +71,7 @@ library RectLib {
     function whichQuadrant(
         Rect memory rect,
         Point memory point
-    ) internal pure returns (Quadrant) {
+    ) public pure returns (Quadrant) {
         int32 midX = (rect.min.x + rect.max.x) / 2;
         int32 midY = (rect.min.y + rect.max.y) / 2;
         if (point.y < midY) {
@@ -89,7 +89,7 @@ library RectLib {
         }
     }
 
-    function area(Rect memory rect) internal pure returns (uint256) {
+    function area(Rect memory rect) public pure returns (uint256) {
         return
             uint256(int256(rect.max.x - rect.min.x)) *
             uint256(int256(rect.max.y - rect.min.y));
