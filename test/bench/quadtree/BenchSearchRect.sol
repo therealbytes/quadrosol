@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import "forge-std/Test.sol";
-
 import "./Bench.sol";
 
 contract BenchSearchRect5 is Bench {
@@ -19,18 +17,18 @@ contract BenchSearchRect5 is Bench {
         }
     }
 
-    function precheck() internal override {}
-
     function action() internal virtual override {
         tree.searchRect(Rect(Point(2, 2), Point(7, 7)));
     }
 
-    function logResult(uint256 gas) internal override {
-        console.log("Benchmark-Quadtree-SearchRect-%d: %d", n(), gas);
-    }
+    function precheck() internal override {}
 
     function n() internal view virtual override returns (uint256) {
-        return 10;
+        return 50;
+    }
+
+    function logResult(uint256 gas) internal override {
+        console.log("Benchmark-Quadtree-SearchRect-%d: %d", n(), gas);
     }
 }
 

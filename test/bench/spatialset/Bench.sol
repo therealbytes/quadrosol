@@ -2,8 +2,9 @@
 pragma solidity >=0.8.0;
 
 import "forge-std/Test.sol";
-import "../BenchUtils.sol";
 import "../../../src/SpatialSet.sol";
+
+import { BenchUtils } from "../BenchUtils.sol";
 
 abstract contract Bench is BenchUtils, Test {
     using SpatialSetLib for SpatialSet;
@@ -20,24 +21,7 @@ abstract contract Bench is BenchUtils, Test {
         set.insert(point);
     }
 
-    function testAction() public {
-        precheck();
-        uint256 gasLeft = gasleft();
-        action();
-        logResult(gasLeft - gasleft());
-    }
-
-    function precheck() internal virtual {
+    function precheck() internal virtual override {
         assertEq(set.size(), n());
-    }
-
-    function action() internal virtual;
-
-    function n() internal view virtual returns (uint256) {
-        return 0;
-    }
-
-    function logResult(uint256 gas) internal virtual {
-        console.log("Benchmark-%d: %d", n(), gas);
     }
 }
