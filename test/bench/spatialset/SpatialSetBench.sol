@@ -4,9 +4,9 @@ pragma solidity >=0.8.0;
 import "forge-std/Test.sol";
 import "../../../src/SpatialSet.sol";
 
-import { BenchUtils } from "../BenchUtils.sol";
+import { Bench } from "../Bench.sol";
 
-abstract contract Bench is BenchUtils, Test {
+abstract contract SpatialSetBench is Bench, Test {
     using SpatialSetLib for SpatialSet;
 
     SpatialSet internal set;

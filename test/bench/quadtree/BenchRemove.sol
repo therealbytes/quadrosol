@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import "./Bench.sol";
+import "./QuadTreeBench.sol";
 
-contract BenchRemove is Bench {
+contract BenchRemove is QuadTreeBench {
     using QuadTreeLib for QuadTree;
 
     function action() internal override {

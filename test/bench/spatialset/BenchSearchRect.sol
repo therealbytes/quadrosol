@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import "./Bench.sol";
+import "./SpatialSetBench.sol";
 
-contract BenchSearchRect5 is Bench {
+contract BenchSearchRect5 is SpatialSetBench {
     using SpatialSetLib for SpatialSet;
 
     function setUp() public virtual override {
         super.setUp();
-        populateSquare(side());
+        populateSquare(side(), n());
     }
 
     function precheck() internal override {}

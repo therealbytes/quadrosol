@@ -4,7 +4,7 @@ pragma solidity >=0.8.0;
 import {console} from "forge-std/Console.sol";
 import {Point} from "../../src/Geo.sol";
 
-abstract contract BenchUtils {
+abstract contract Bench {
     bytes32 internal rnd;
 
     function randomUint(uint256 max) internal returns (uint256) {
@@ -22,8 +22,8 @@ abstract contract BenchUtils {
         }
     }
 
-    function populateSquare(uint256 side) internal {
-        for (uint256 i = 0; i < n(); i++) {
+    function populateSquare(uint256 side, uint256 units) internal {
+        for (uint256 i = 0; i < units; i++) {
             Point memory point = Point(
                 int32(int256(randomUint(side))),
                 int32(int256(randomUint(side)))
@@ -31,6 +31,8 @@ abstract contract BenchUtils {
             insert(point);
         }
     }
+
+    function insert(Point memory point) internal virtual;
 
     function testAction() public {
         precheck();
@@ -48,6 +50,4 @@ abstract contract BenchUtils {
     function action() internal virtual;
 
     function n() internal view virtual returns (uint256);
-
-    function insert(Point memory point) internal virtual;
 }

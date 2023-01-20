@@ -4,9 +4,9 @@ pragma solidity >=0.8.0;
 import "forge-std/Test.sol";
 import "../../../src/QuadTree.sol";
 
-import { BenchUtils } from "../BenchUtils.sol";
+import { Bench } from "../Bench.sol";
 
-abstract contract Bench is BenchUtils, Test {
+abstract contract QuadTreeBench is Bench, Test {
     using QuadTreeLib for QuadTree;
 
     QuadTree internal tree;
