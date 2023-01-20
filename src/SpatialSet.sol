@@ -16,10 +16,10 @@ library SpatialSetLib {
         return ss.set.size();
     }
 
-    function insert(SpatialSet storage ss, Point memory point)
-        external
-        returns (bool)
-    {
+    function insert(
+        SpatialSet storage ss,
+        Point memory point
+    ) external returns (bool) {
         if (!ss.rect.contains(point)) {
             return false;
         }
@@ -31,10 +31,10 @@ library SpatialSetLib {
         return true;
     }
 
-    function remove(SpatialSet storage ss, Point memory point)
-        external
-        returns (bool)
-    {
+    function remove(
+        SpatialSet storage ss,
+        Point memory point
+    ) external returns (bool) {
         uint256 data = encodePoint(point);
         if (!ss.set.has(data)) {
             return false;
@@ -43,40 +43,48 @@ library SpatialSetLib {
         return true;
     }
 
-    function contains(SpatialSet storage ss, Point memory point)
-        external
-        view
-        returns (bool)
-    {
+    function contains(
+        SpatialSet storage ss,
+        Point memory point
+    ) external view returns (bool) {
         return ss.set.has(encodePoint(point));
     }
 
-    function searchRect(SpatialSet storage ss, Rect memory rect)
-        external
-        view
-        returns (Point[] memory)
-    {
-        uint256 alloc;
-        if (ss.set.size() > ss.rect.area()) {
-            alloc = ss.rect.area();
-        } else {
-            alloc = ss.set.size();
-        }
-        Point[] memory points = new Point[](alloc);
+    function searchRect(
+        SpatialSet storage ss,
+        Rect memory rect
+    ) external view returns (Point[] memory) {
+        uint256 setSize = ss.set.size();
+        uint256 searchArea = rect.area();
         uint256 count = 0;
-        for (uint256 i = 0; i < ss.set.size(); i++) {
-            (bool ok, uint256 data) = ss.set.getItem(i);
-            Point memory point = decodePoint(data);
-            if (rect.contains(point)) {
-                points[count] = point;
-                count++;
+        Point[] memory points;
+
+        if (setSize < searchArea) {
+            points = new Point[](setSize);
+            for (uint256 i = 0; i < setSize; i++) {
+                (bool ok, uint256 data) = ss.set.getItem(i);
+                Point memory point = decodePoint(data);
+                if (rect.contains(point)) {
+                    points[count] = point;
+                    count++;
+                }
+            }
+        } else {
+            points = new Point[](searchArea);
+            for (int32 x = rect.min.x; x <= rect.max.x; x++) {
+                for (int32 y = rect.min.y; y <= rect.max.y; y++) {
+                    Point memory point = Point(x, y);
+                    if (ss.set.has(encodePoint(point))) {
+                        points[count] = point;
+                        count++;
+                    }
+                }
             }
         }
+
         assembly {
             // resize array
             mstore(points, count)
-            // free memory
-            // mstore(0x40, add(add(points, 0x20), mul(count, 0x40)))
         }
         return points;
     }
@@ -88,7 +96,7 @@ library SpatialSetLib {
     }
 
     function decodePoint(uint256 data) internal pure returns (Point memory) {
-        int32 y = int32(int256(data & (2**32 - 1)));
+        int32 y = int32(int256(data & (2 ** 32 - 1)));
         int32 x = int32(int256(data >> 32));
         return Point(x, y);
     }
