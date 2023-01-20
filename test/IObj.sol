@@ -4,6 +4,8 @@ pragma solidity >=0.8.0;
 import {Point, Rect} from "../src/Geo.sol";
 
 interface IObj {
+    function size() external returns (uint256);
+
     function insert(Point memory point) external returns (bool);
 
     function remove(Point memory point) external returns (bool);

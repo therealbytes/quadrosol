@@ -14,6 +14,10 @@ contract QuadTreeObj is IObj {
         tree.rect = rect;
     }
 
+    function size() external view returns (uint256) {
+        return tree.size();
+    }
+
     function insert(Point memory point) external returns (bool) {
         return tree.insert(point);
     }

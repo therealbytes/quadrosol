@@ -15,6 +15,10 @@ contract SpatialSetObj is IObj {
         set.set = new Set();
     }
 
+    function size() external view returns (uint256) {
+        return set.size();
+    }
+
     function insert(Point memory point) external returns (bool) {
         return set.insert(point);
     }
