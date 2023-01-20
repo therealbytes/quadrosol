@@ -1,34 +1,34 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import "./Test.sol";
+import "./IObj.sol";
 
-import {Point, Rect, QuadTree, QuadTreeLib} from "../src/QuadTree.sol";
+import {QuadTree, QuadTreeLib} from "../src/QuadTree.sol";
 
-contract QuadTreeTest is ObjTest {
+contract QuadTreeObj is IObj {
     using QuadTreeLib for QuadTree;
 
     QuadTree internal tree;
 
-    function setRect(Rect memory rect) internal override {
+    constructor(Rect memory rect) {
         tree.rect = rect;
     }
 
-    function insert(Point memory point) internal override returns (bool) {
+    function insert(Point memory point) external returns (bool) {
         return tree.insert(point);
     }
 
-    function remove(Point memory point) internal override returns (bool) {
+    function remove(Point memory point) external returns (bool) {
         return tree.remove(point);
     }
 
-    function contains(Point memory point) internal override returns (bool) {
+    function contains(Point memory point) external view returns (bool) {
         return tree.contains(point);
     }
 
     function searchRect(Rect memory rect)
-        internal
-        override
+        external
+        view
         returns (Point[] memory)
     {
         return tree.searchRect(rect);

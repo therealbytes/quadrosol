@@ -1,39 +1,35 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import "./Test.sol";
+import "./IObj.sol";
 
-import {Point, Rect, Set, SpatialSet, SpatialSetLib} from "../src/SpatialSet.sol";
+import {Set, SpatialSet, SpatialSetLib} from "../src/SpatialSet.sol";
 
-contract SpatialSetTest is ObjTest {
+contract SpatialSetObj is IObj {
     using SpatialSetLib for SpatialSet;
 
     SpatialSet internal set;
 
-    function setUp() public override {
-        super.setUp();
+    constructor(Rect memory rect) {
+        set.rect = rect;
         set.set = new Set();
     }
 
-    function setRect(Rect memory rect) internal override {
-        set.rect = rect;
-    }
-
-    function insert(Point memory point) internal override returns (bool) {
+    function insert(Point memory point) external returns (bool) {
         return set.insert(point);
     }
 
-    function remove(Point memory point) internal override returns (bool) {
+    function remove(Point memory point) external returns (bool) {
         return set.remove(point);
     }
 
-    function contains(Point memory point) internal override returns (bool) {
+    function contains(Point memory point) external view returns (bool) {
         return set.contains(point);
     }
 
     function searchRect(Rect memory rect)
-        internal
-        override
+        external
+        view
         returns (Point[] memory)
     {
         return set.searchRect(rect);
