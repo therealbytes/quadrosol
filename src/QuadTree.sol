@@ -152,10 +152,10 @@ library QuadTreeLib {
         return qt._size;
     }
 
-    function insert(QuadTree storage qt, Point memory point)
-        internal
-        returns (bool)
-    {
+    function insert(
+        QuadTree storage qt,
+        Point memory point
+    ) internal returns (bool) {
         if (!qt.rect.contains(point)) {
             return false;
         }
@@ -166,10 +166,10 @@ library QuadTreeLib {
         return false;
     }
 
-    function remove(QuadTree storage qt, Point memory point)
-        internal
-        returns (bool)
-    {
+    function remove(
+        QuadTree storage qt,
+        Point memory point
+    ) internal returns (bool) {
         if (!qt.rect.contains(point)) {
             return false;
         }
@@ -180,22 +180,20 @@ library QuadTreeLib {
         return false;
     }
 
-    function contains(QuadTree storage qt, Point memory point)
-        internal
-        view
-        returns (bool)
-    {
+    function contains(
+        QuadTree storage qt,
+        Point memory point
+    ) internal view returns (bool) {
         if (!qt.rect.contains(point)) {
             return false;
         }
         return qt.root.contains(qt.rect, point);
     }
 
-    function searchRect(QuadTree storage qt, Rect memory rect)
-        internal
-        view
-        returns (Point[] memory)
-    {
+    function searchRect(
+        QuadTree storage qt,
+        Rect memory rect
+    ) internal view returns (Point[] memory) {
         Point[] memory tracer = new Point[](0);
         if (!qt.rect.intersects(rect)) {
             return tracer;

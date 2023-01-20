@@ -19,11 +19,10 @@ enum Quadrant {
 }
 
 library RectLib {
-    function contains(Rect memory rect, Point memory point)
-        internal
-        pure
-        returns (bool)
-    {
+    function contains(
+        Rect memory rect,
+        Point memory point
+    ) internal pure returns (bool) {
         return
             rect.min.x <= point.x &&
             point.x < rect.max.x &&
@@ -32,11 +31,10 @@ library RectLib {
     }
 
     // TODO: wording -- intersects or overlaps?
-    function intersects(Rect memory rect, Rect memory other)
-        internal
-        pure
-        returns (bool)
-    {
+    function intersects(
+        Rect memory rect,
+        Rect memory other
+    ) internal pure returns (bool) {
         return
             rect.min.x < other.max.x &&
             other.min.x < rect.max.x &&
@@ -44,11 +42,10 @@ library RectLib {
             other.min.y < rect.max.y;
     }
 
-    function quadrant(Rect memory rect, Quadrant quad)
-        internal
-        pure
-        returns (Rect memory)
-    {
+    function quadrant(
+        Rect memory rect,
+        Quadrant quad
+    ) internal pure returns (Rect memory) {
         int32 midX = (rect.min.x + rect.max.x) / 2;
         int32 midY = (rect.min.y + rect.max.y) / 2;
         if (quad == Quadrant.TOP_LEFT) {
@@ -71,11 +68,10 @@ library RectLib {
         revert("RectLib: Invalid quadrant");
     }
 
-    function whichQuadrant(Rect memory rect, Point memory point)
-        internal
-        pure
-        returns (Quadrant)
-    {
+    function whichQuadrant(
+        Rect memory rect,
+        Point memory point
+    ) internal pure returns (Quadrant) {
         int32 midX = (rect.min.x + rect.max.x) / 2;
         int32 midY = (rect.min.y + rect.max.y) / 2;
         if (point.y < midY) {
