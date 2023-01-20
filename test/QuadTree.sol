@@ -7,7 +7,7 @@ import "../src/QuadTree.sol";
 contract QuadTreeTest is Test {
     using QuadTreeLib for QuadTree;
 
-    QuadTree tree;
+    QuadTree internal tree;
 
     function setUp() public {
         tree.rect = Rect(Point(-10, -10), Point(10, 10));
