@@ -5,12 +5,40 @@ import "forge-std/Test.sol";
 
 import "./Bench.sol";
 
-contract BenchSearchRect is Bench {
+contract BenchSearchRect5 is Bench {
     using QuadTreeLib for QuadTree;
-    bytes32 internal rnd;
+
+    function setUp() public virtual override {
+        super.setUp();
+        for (uint256 i = 0; i < n(); i++) {
+            Point memory point = Point(
+                int32(int256(randomUint(10))),
+                int32(int256(randomUint(10)))
+            );
+            tree.insert(point);
+        }
+    }
+
+    function precheck() internal override {}
+
+    function action() internal virtual override {
+        tree.searchRect(Rect(Point(2, 2), Point(7, 7)));
+    }
+
+    function logResult(uint256 gas) internal override {
+        console.log("Benchmark-Quadtree-SearchRect-%d: %d", n(), gas);
+    }
+
+    function n() internal view virtual override returns (uint256) {
+        return 10;
+    }
+}
+
+contract BenchSearchRect50 is BenchSearchRect5 {
+    using QuadTreeLib for QuadTree;
 
     function setUp() public override {
-        super.setUp();
+        Bench.setUp();
         for (uint256 i = 0; i < n(); i++) {
             Point memory point = Point(
                 int32(int256(randomUint(100))),
@@ -20,19 +48,8 @@ contract BenchSearchRect is Bench {
         }
     }
 
-    function randomUint(uint256 max) internal returns (uint256) {
-        rnd = keccak256(abi.encodePacked(rnd));
-        return uint256(rnd) % max;
-    }
-
-    function precheck() internal override {}
-
     function action() internal override {
         tree.searchRect(Rect(Point(25, 25), Point(75, 75)));
-    }
-
-    function logResult(uint256 gas) internal override {
-        console.log("Benchmark-SearchRect-%d: %d", n(), gas);
     }
 
     function n() internal view virtual override returns (uint256) {

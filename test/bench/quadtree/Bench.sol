@@ -2,16 +2,21 @@
 pragma solidity >=0.8.0;
 
 import "forge-std/Test.sol";
+import "../BenchUtils.sol";
 import "../../../src/QuadTree.sol";
 
-contract Bench is Test {
+abstract contract Bench is BenchUtils, Test {
     using QuadTreeLib for QuadTree;
 
-    QuadTree tree;
+    QuadTree internal tree;
 
     function setUp() public virtual {
         tree.rect = Rect(Point(-10000, -10000), Point(10000, 10000));
         insertMany(n());
+    }
+
+    function insert(Point memory point) internal override {
+        tree.insert(point);
     }
 
     function testAction() public {
@@ -21,23 +26,11 @@ contract Bench is Test {
         logResult(gasLeft - gasleft());
     }
 
-    function insertMany(uint256 n) internal {
-        insertMany(0, int256(n));
-    }
-
-    function insertMany(int256 a, int256 b) internal {
-        for (int256 i = a; i < b; i++) {
-            tree.insert(Point(int32(int256(i)), int32(int256(i))));
-        }
-    }
-
     function precheck() internal virtual {
         assertEq(tree.size(), n());
     }
 
-    function action() internal virtual {
-        tree.insert(Point(-1, -1));
-    }
+    function action() internal virtual;
 
     function n() internal view virtual returns (uint256) {
         return 0;
