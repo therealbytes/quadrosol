@@ -19,7 +19,7 @@ struct QuadTree {
 library NodeLib {
     using RectLib for Rect;
 
-    uint256 constant NODE_POINTS = 4;
+    uint256 internal constant NODE_POINTS = 4;
 
     function isLeaf(Node storage node) internal view returns (bool) {
         return !node.isInternal;
