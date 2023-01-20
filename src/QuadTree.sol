@@ -194,7 +194,6 @@ library QuadTreeLib {
         QuadTree storage qt,
         Rect memory rect
     ) public view returns (Point[] memory) {
-
         Point[] memory points;
 
         if (!qt.rect.intersects(rect)) {
