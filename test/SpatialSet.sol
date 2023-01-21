@@ -38,4 +38,12 @@ contract SpatialSetObj is IObj {
     {
         return set.searchRect(rect);
     }
+
+    function nearest(Pcoint memory point)
+        external
+        view
+        returns (Point memory, bool)
+    {
+        return set.nearest(point);
+    }
 }

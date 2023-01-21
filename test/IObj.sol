@@ -13,4 +13,6 @@ interface IObj {
     function contains(Point memory point) external returns (bool);
 
     function searchRect(Rect memory rect) external returns (Point[] memory);
+
+    function nearest(Point memory point) external returns (Point memory, bool);
 }

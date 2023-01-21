@@ -17,6 +17,7 @@ struct QuadTree {
 }
 
 library NodeLib {
+    using PointLib for Point;
     using RectLib for Rect;
 
     uint256 internal constant NODE_POINTS = 4;
@@ -142,6 +143,42 @@ library NodeLib {
             return count;
         }
     }
+
+    function nearest(
+        Node storage node,
+        Rect memory rect,
+        Point memory point,
+        Point memory nearestPoint,
+        uint256 minDistanceSq,
+        bool haveNearest
+    ) public view returns (Point memory, uint256, bool) {
+        if (isLeaf(node)) {
+            for (uint256 i = 0; i < node.points.length; i++) {
+                uint256 d = point.distanceSq(node.points[i]);
+                if (d < minDistanceSq) {
+                    nearestPoint = node.points[i];
+                    minDistanceSq = d;
+                    haveNearest = true;
+                }
+            }
+            return (nearestPoint, minDistanceSq, haveNearest);
+        } else {
+            for (uint256 i = 0; i < 4; i++) {
+                Quadrant q = Quadrant(i);
+                if (rect.quadrant(q).distanceSq(point) < minDistanceSq) {
+                    (nearestPoint, minDistanceSq, haveNearest) = nearest(
+                        node.children[q],
+                        rect.quadrant(q),
+                        point,
+                        nearestPoint,
+                        minDistanceSq,
+                        haveNearest
+                    );
+                }
+            }
+            return (nearestPoint, minDistanceSq, haveNearest);
+        }
+    }
 }
 
 library QuadTreeLib {
@@ -195,12 +232,25 @@ library QuadTreeLib {
         Rect memory rect
     ) public view returns (Point[] memory) {
         Point[] memory points;
+        uint256 arraySize;
 
         if (!qt.rect.intersects(rect)) {
             return points;
         }
 
-        points = new Point[](qt._size);
+        // Assuming uniform distribution
+        // uint256 expectedPoints = (qt._size * rect.area()) / qt.rect.area();
+
+        if (false) {
+            arraySize = qt.root.searchRect(qt.rect, rect, new Point[](0), 0);
+            if (arraySize == 0) {
+                return points;
+            }
+        } else {
+            arraySize = MathUtilsLib.min(qt._size, rect.area());
+        }
+
+        points = new Point[](arraySize);
         uint256 count = qt.root.searchRect(qt.rect, rect, points, 0);
 
         assembly {
@@ -209,17 +259,23 @@ library QuadTreeLib {
         }
 
         return points;
+    }
 
-        // Point[] memory tracer = new Point[](0);
-        // if (!qt.rect.intersects(rect)) {
-        //     return tracer;
-        // }
-        // uint256 count = qt.root.searchRect(qt.rect, rect, tracer, 0);
-        // if (count == 0) {
-        //     return tracer;
-        // }
-        // Point[] memory points = new Point[](count);
-        // qt.root.searchRect(qt.rect, rect, points, 0);
-        // return points;
+    function nearest(
+        QuadTree storage qt,
+        Point memory point,
+        uint256 maxDistanceSq
+    ) public view returns (Point memory, bool) {
+        (Point memory nearestPoint, uint256 distanceSq, bool haveNearest) = qt
+            .root
+            .nearest(qt.rect, point, Point(0, 0), maxDistanceSq, false);
+        return (nearestPoint, haveNearest);
+    }
+
+    function nearest(
+        QuadTree storage qt,
+        Point memory point
+    ) public view returns (Point memory, bool) {
+        return nearest(qt, point, 2 ** 32 - 1);
     }
 }

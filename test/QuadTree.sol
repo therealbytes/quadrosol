@@ -37,4 +37,8 @@ contract QuadTreeObj is IObj {
     {
         return tree.searchRect(rect);
     }
+
+    function nearest(Point memory point) external view returns (Point memory, bool) {
+        return tree.nearest(point);
+    }
 }

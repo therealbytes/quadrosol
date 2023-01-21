@@ -53,6 +53,20 @@ abstract contract ObjTest is Test {
         }
     }
 
+    function testNearest() public {
+        Point memory p0 = Point(0, 0);
+        Point memory p1 = Point(1, 1);
+        Point memory p2 = Point(5, 5);
+        Point memory p3 = Point(-5, -5);
+        assertTrue(obj.insert(p0));
+        assertTrue(obj.insert(p1));
+        assertTrue(obj.insert(p2));
+        assertTrue(obj.insert(p3));
+        (Point memory point, bool ok) = obj.nearest(Point(6, 6));
+        assertTrue(ok);
+        assertTrue(pointEq(point, p2));
+    }
+
     function pointEq(Point memory a, Point memory b) internal returns (bool) {
         return a.x == b.x && a.y == b.y;
     }

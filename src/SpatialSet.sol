@@ -10,6 +10,7 @@ struct SpatialSet {
 }
 
 library SpatialSetLib {
+    using PointLib for Point;
     using RectLib for Rect;
 
     function size(SpatialSet storage ss) public view returns (uint256) {
@@ -48,6 +49,18 @@ library SpatialSetLib {
         Point memory point
     ) public view returns (bool) {
         return ss.set.has(encodePoint(point));
+    }
+
+    function encodePoint(Point memory point) internal pure returns (uint256) {
+        uint256 data = uint256(int256(point.x));
+        data = (data << 32) | uint256(int256(point.y));
+        return data;
+    }
+
+    function decodePoint(uint256 data) internal pure returns (Point memory) {
+        int32 y = int32(int256(data & (2 ** 32 - 1)));
+        int32 x = int32(int256(data >> 32));
+        return Point(x, y);
     }
 
     function searchRect(
@@ -96,15 +109,59 @@ library SpatialSetLib {
         return points;
     }
 
-    function encodePoint(Point memory point) internal pure returns (uint256) {
-        uint256 data = uint256(int256(point.x));
-        data = (data << 32) | uint256(int256(point.y));
-        return data;
+    function nearest(
+        SpatialSet storage ss,
+        Point memory point,
+        uint256 maxDistance
+    ) public view returns (Point memory, bool) {
+
+        Point memory nearestPoint;
+        uint256 minDistanceSq = maxDistance;
+        bool haveNearest;
+
+        uint256 setSize = ss.set.size();
+
+        // if (49 * setSize < 37 * searchArea) {
+        if (true) {
+            // Check every point in the set
+            for (uint256 i = 0; i < setSize; i++) {
+                (bool ok, uint256 data) = ss.set.getItem(i);
+                Point memory p = decodePoint(data);
+                uint256 distanceSq = point.distanceSq(p);
+                if (distanceSq < minDistanceSq) {
+                    minDistanceSq = distanceSq;
+                    nearestPoint = p;
+                    haveNearest = true;
+                }
+            }
+            return (nearestPoint, haveNearest);
+        } else {
+            // // Check every point in the search area
+            // uint256 minDistance = 2**32 - 1;
+            // Point memory nearestPoint;
+            // bool found = false;
+            // for (int32 x = rect.min.x; x <= rect.max.x; x++) {
+            //     for (int32 y = rect.min.y; y <= rect.max.y; y++) {
+            //         Point memory p = Point(x, y);
+            //         if (ss.set.has(encodePoint(p))) {
+            //             uint256 distance = GeoLib.distance(point, p);
+            //             if (distance < minDistance) {
+            //                 minDistance = distance;
+            //                 nearestPoint = p;
+            //                 found = true;
+            //             }
+            //         }
+            //     }
+            // }
+            return (nearestPoint, haveNearest);
+        }
     }
 
-    function decodePoint(uint256 data) internal pure returns (Point memory) {
-        int32 y = int32(int256(data & (2 ** 32 - 1)));
-        int32 x = int32(int256(data >> 32));
-        return Point(x, y);
+    function nearest(SpatialSet storage ss, Point memory point)
+        public
+        view
+        returns (Point memory, bool)
+    {
+        return nearest(ss, point, 2**32 - 1);
     }
 }
