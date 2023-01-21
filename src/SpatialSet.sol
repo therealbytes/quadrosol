@@ -17,10 +17,10 @@ library SpatialSetLib {
         return ss.set.size();
     }
 
-    function insert(SpatialSet storage ss, Point memory point)
-        public
-        returns (bool)
-    {
+    function insert(
+        SpatialSet storage ss,
+        Point memory point
+    ) public returns (bool) {
         if (!ss.rect.contains(point)) {
             return false;
         }
@@ -32,10 +32,10 @@ library SpatialSetLib {
         return true;
     }
 
-    function remove(SpatialSet storage ss, Point memory point)
-        public
-        returns (bool)
-    {
+    function remove(
+        SpatialSet storage ss,
+        Point memory point
+    ) public returns (bool) {
         uint256 data = encodePoint(point);
         if (!ss.set.has(data)) {
             return false;
@@ -44,11 +44,10 @@ library SpatialSetLib {
         return true;
     }
 
-    function contains(SpatialSet storage ss, Point memory point)
-        public
-        view
-        returns (bool)
-    {
+    function contains(
+        SpatialSet storage ss,
+        Point memory point
+    ) public view returns (bool) {
         return ss.set.has(encodePoint(point));
     }
 
@@ -59,16 +58,15 @@ library SpatialSetLib {
     }
 
     function decodePoint(uint256 data) internal pure returns (Point memory) {
-        int32 y = int32(int256(data & (2**32 - 1)));
+        int32 y = int32(int256(data & (2 ** 32 - 1)));
         int32 x = int32(int256(data >> 32));
         return Point(x, y);
     }
 
-    function searchRect(SpatialSet storage ss, Rect memory rect)
-        public
-        view
-        returns (Point[] memory)
-    {
+    function searchRect(
+        SpatialSet storage ss,
+        Rect memory rect
+    ) public view returns (Point[] memory) {
         Point[] memory points;
 
         if (!ss.rect.intersects(rect)) {
@@ -133,11 +131,10 @@ library SpatialSetLib {
         return (nearestPoint, haveNearest);
     }
 
-    function nearest(SpatialSet storage ss, Point memory point)
-        public
-        view
-        returns (Point memory, bool)
-    {
-        return nearest(ss, point, 2**32 - 1);
+    function nearest(
+        SpatialSet storage ss,
+        Point memory point
+    ) public view returns (Point memory, bool) {
+        return nearest(ss, point, 2 ** 32 - 1);
     }
 }
