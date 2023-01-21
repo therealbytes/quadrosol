@@ -68,17 +68,28 @@ abstract contract ObjBench is Test {
     }
 
     // TODO: benchContainsNo
-    // TODO: naming
 
-    function benchQuery(uint256 pm, uint256 query) internal {
+    function benchSearchRect(uint256 pm, uint256 query) internal {
         uint256 units = (area(rect) * pm) / 1000;
         insertMany(units);
         Rect memory queryRect = Rect(Point(0, 0), pointInDiagonal(query));
         startGasMetering();
-        Point[] memory points = obj.searchRect(queryRect);
+        obj.searchRect(queryRect);
         uint256 gas = endGasMetering();
-        console.log("Query-%d-%d: %d", pm, query, gas);
+        console.log("SearchRect-%d-%d: %d", pm, query, gas);
         console.log(pm, query, gas);
+    }
+
+    function benchNearest(uint256 pm) internal {
+        uint256 units = (area(rect) * pm) / 1000;
+        insertMany(units);
+        Point[] memory points = newRandomPoints(RUNS);
+        startGasMetering();
+        for (uint256 i = 0; i < RUNS; i++) {
+            obj.nearest(points[i]);
+        }
+        uint256 gas = endGasMetering() / RUNS;
+        console.log("Nearest-%d: %d", pm, gas);
     }
 
     function testBenchInsert() public {
@@ -105,28 +116,47 @@ abstract contract ObjBench is Test {
         }
     }
 
-    function testBenchQuery256Dense() public {
-        console.log("%s: Query", name);
-        // percentage index
+    function testBenchSearchRect256Dense() public {
+        console.log("%s: SearchRect 256Dense", name);
+        // percentage exponent
         for (uint256 i = 0; i < 3; i++) {
             // query exponent
             for (uint256 j = 3; j < 7; j++) {
-                benchQuery(3**i * 10, 2**j);
+                benchSearchRect(3**i * 10, 2**j);
                 reset();
             }
         }
     }
-    
-    function testBenchQuery1024Sparse() public {
+
+    function testBenchSearchRect1024Sparse() public {
         reset(1024);
-        console.log("%s: Query", name);
-        // percentage index
+        console.log("%s: SearchRect 1024Sparse", name);
+        // percentage exponent
         for (uint256 i = 0; i < 3; i++) {
             // query exponent
             for (uint256 j = 5; j < 9; j++) {
-                benchQuery(3**i, 2**j);
+                benchSearchRect(3**i, 2**j);
                 reset();
             }
+        }
+    }
+
+    function testBenchNearest256Dense() public {
+        console.log("%s: Nearest 256Dense", name);
+        // percentage exponent
+        for (uint256 i = 0; i < 3; i++) {
+            benchNearest(3**i * 10);
+            reset();
+        }
+    }
+
+    function testBenchNearest1024Sparse() public {
+        reset(1024);
+        console.log("%s: Nearest 1024Sparse", name);
+        // percentage exponent
+        for (uint256 i = 0; i < 3; i++) {
+            benchNearest(3**i);
+            reset();
         }
     }
 
