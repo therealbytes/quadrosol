@@ -114,6 +114,10 @@ library SpatialSetLib {
         Point memory point,
         uint256 maxDistance
     ) public view returns (Point memory, bool) {
+        if (contains(ss, point)) {
+            return (point, true);
+        }
+
         Point memory nearestPoint;
         uint256 minDistanceSq = maxDistance;
         bool haveNearest;
@@ -126,6 +130,9 @@ library SpatialSetLib {
                 minDistanceSq = distanceSq;
                 nearestPoint = p;
                 haveNearest = true;
+                if (distanceSq == 0) {
+                    break;
+                }
             }
         }
         return (nearestPoint, haveNearest);

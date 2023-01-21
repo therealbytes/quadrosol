@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "./Geo.sol";
 
+// TODO: Experiment with size tracking
 struct Node {
     bool isInternal;
     mapping(Quadrant => Node) children;
@@ -151,7 +152,15 @@ library NodeLib {
         Point memory nearestPoint,
         uint256 minDistanceSq,
         bool haveNearest
-    ) public view returns (Point memory, uint256, bool) {
+    )
+        public
+        view
+        returns (
+            Point memory,
+            uint256,
+            bool
+        )
+    {
         if (isLeaf(node)) {
             for (uint256 i = 0; i < node.points.length; i++) {
                 uint256 d = point.distanceSq(node.points[i]);
@@ -163,7 +172,25 @@ library NodeLib {
             }
             return (nearestPoint, minDistanceSq, haveNearest);
         } else {
+            // Go down the branch that would contain the point first
+            uint256 skip = 5; // Not a quadrant
+            if (!haveNearest) {
+                // This works even if the point is outside the rect
+                Quadrant q = rect.whichQuadrant(point);
+                skip = uint256(q);
+                (nearestPoint, minDistanceSq, haveNearest) = nearest(
+                    node.children[q],
+                    rect.quadrant(q),
+                    point,
+                    nearestPoint,
+                    minDistanceSq,
+                    haveNearest
+                );
+            }
             for (uint256 i = 0; i < 4; i++) {
+                if (i == skip) {
+                    continue;
+                }
                 Quadrant q = Quadrant(i);
                 if (rect.quadrant(q).distanceSq(point) < minDistanceSq) {
                     (nearestPoint, minDistanceSq, haveNearest) = nearest(
@@ -174,6 +201,9 @@ library NodeLib {
                         minDistanceSq,
                         haveNearest
                     );
+                    if (minDistanceSq == 0) {
+                        break;
+                    }
                 }
             }
             return (nearestPoint, minDistanceSq, haveNearest);
@@ -189,10 +219,10 @@ library QuadTreeLib {
         return qt._size;
     }
 
-    function insert(
-        QuadTree storage qt,
-        Point memory point
-    ) public returns (bool) {
+    function insert(QuadTree storage qt, Point memory point)
+        public
+        returns (bool)
+    {
         if (!qt.rect.contains(point)) {
             return false;
         }
@@ -203,10 +233,10 @@ library QuadTreeLib {
         return false;
     }
 
-    function remove(
-        QuadTree storage qt,
-        Point memory point
-    ) public returns (bool) {
+    function remove(QuadTree storage qt, Point memory point)
+        public
+        returns (bool)
+    {
         if (!qt.rect.contains(point)) {
             return false;
         }
@@ -217,20 +247,22 @@ library QuadTreeLib {
         return false;
     }
 
-    function contains(
-        QuadTree storage qt,
-        Point memory point
-    ) public view returns (bool) {
+    function contains(QuadTree storage qt, Point memory point)
+        public
+        view
+        returns (bool)
+    {
         if (!qt.rect.contains(point)) {
             return false;
         }
         return qt.root.contains(qt.rect, point);
     }
 
-    function searchRect(
-        QuadTree storage qt,
-        Rect memory rect
-    ) public view returns (Point[] memory) {
+    function searchRect(QuadTree storage qt, Rect memory rect)
+        public
+        view
+        returns (Point[] memory)
+    {
         Point[] memory points;
         uint256 arraySize;
 
@@ -272,10 +304,11 @@ library QuadTreeLib {
         return (nearestPoint, haveNearest);
     }
 
-    function nearest(
-        QuadTree storage qt,
-        Point memory point
-    ) public view returns (Point memory, bool) {
-        return nearest(qt, point, 2 ** 32 - 1);
+    function nearest(QuadTree storage qt, Point memory point)
+        public
+        view
+        returns (Point memory, bool)
+    {
+        return nearest(qt, point, 2**32 - 1);
     }
 }
