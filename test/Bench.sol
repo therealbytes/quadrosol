@@ -18,7 +18,11 @@ abstract contract ObjBench is Test {
     uint256 internal constant RUNS = 32;
 
     function setUp() public virtual {
-        rect = Rect(Point(-10000, -10000), Point(10000, 10000));
+        reset(1024);
+    }
+
+    function reset(uint256 side) internal virtual {
+        rect = Rect(Point(0, 0), pointInDiagonal(side));
         reset();
     }
 
@@ -26,8 +30,9 @@ abstract contract ObjBench is Test {
 
     function benchInsert(uint256 units) internal {
         insertMany(units);
+        Point[] memory points = newRandomPoints(RUNS);
         startGasMetering();
-        populateSquare(10000, RUNS);
+        insertPoints(points);
         uint256 gas = endGasMetering() / RUNS;
         console.log("Insert-%d: %d", units, gas);
         assertEq(obj.size(), units + RUNS);
@@ -39,44 +44,47 @@ abstract contract ObjBench is Test {
         if (units < runs) {
             runs = units;
         }
+        Point[] memory points = newRandomPoints(runs);
+        insertPoints(points);
         startGasMetering();
         for (uint256 i = 0; i < runs; i++) {
-            obj.remove(pointInDiagonal(i));
+            obj.remove(points[i]);
         }
         uint256 gas = endGasMetering() / runs;
         console.log("Remove-%d: %d", units, gas);
-        assertEq(obj.size(), units - runs);
+        assertEq(obj.size(), units);
     }
 
-    function benchContains(uint256 units) internal {
+    function benchContainsYes(uint256 units) internal {
         insertMany(units);
+        Point[] memory points = newRandomPoints(RUNS);
+        insertPoints(points);
         startGasMetering();
         for (uint256 i = 0; i < RUNS; i++) {
-            obj.contains(randomPoint(units));
+            obj.contains(points[i]);
         }
         uint256 gas = endGasMetering() / RUNS;
         console.log("Contains-%d: %d", units, gas);
     }
 
+    // TODO: benchContainsNo
+    // TODO: naming
+
     function benchQuery(
         uint256 side,
-        uint256 pc,
+        uint256 pm,
         uint256 query
     ) internal {
-        uint256 units = (side**2 * pc) / 100;
-        populateSquare(side, units);
+        reset(side);
+        uint256 units = (side**2 * pm) / 1000;
+        insertMany(units);
+        Rect memory queryRect = Rect(Point(0, 0), pointInDiagonal(query));
         startGasMetering();
-        // TODO: naming
-        Point[] memory points = obj.searchRect(
-            Rect(pointInDiagonal(uint256(0)), pointInDiagonal(query))
-        );
+        Point[] memory points = obj.searchRect(queryRect);
         uint256 gas = endGasMetering();
-        // console.log("Query-%d-%d-%d", side, pc, query);
-        // console.log("Gas: %d", gas);
-        console.log(side, pc, query, gas);
-        // uint256 expectedPointsAprox = (units * query**2) / side**2;
-        // console.log("Expected points: %d", expectedPointsAprox);
-        // console.log("Actual points: %d", points.length);
+        console.log("Query-%d-%d-%d", side, pm, query);
+        console.log("Gas: %d", gas);
+        // console.log(side, pm, query, gas);
     }
 
     function testBenchInsert() public {
@@ -98,13 +106,13 @@ abstract contract ObjBench is Test {
     function testBenchContains() public {
         console.log("%s: Contains", name);
         for (uint256 i = 0; i < 4; i++) {
-            benchContains(10**i);
+            benchContainsYes(10**i);
             reset();
         }
     }
 
-    function testBenchQuery() public {
-        console.log("%s: Query", name);
+    function testBenchQuerySmall() public {
+        console.log("%s: Query Small", name);
         uint8[4] memory percentages = [1, 3, 9, 12];
         // side exponent
         for (uint256 i = 4; i < 9; i++) {
@@ -112,11 +120,17 @@ abstract contract ObjBench is Test {
             for (uint256 j = 3; j < i - 1; j++) {
                 // percentage index
                 for (uint256 k = 0; k < percentages.length; k++) {
-                    benchQuery(2**i, percentages[k], 2**j);
-                    reset();
+                    benchQuery(2**i, percentages[k] * 10, 2**j);
+                    // reset();
                 }
             }
         }
+    }
+
+    function testBenchQueryBig() public {
+        console.log("%s: Query Big", name);
+        benchQuery(2048, 1, 64);
+        // reset();
     }
 
     // ================== Helpers ==================
@@ -125,54 +139,58 @@ abstract contract ObjBench is Test {
         gu = gasleft();
     }
 
-    function endGasMetering() internal returns (uint256) {
+    function endGasMetering() internal view returns (uint256) {
         return gu - gasleft();
     }
 
-    function randomUint(uint256 max) internal returns (uint256) {
-        rnd = keccak256(abi.encodePacked(rnd));
-        return uint256(rnd) % max;
-    }
-
-    // Generate a random point withing [(0,0), (max, max)]
-    function randomPoint(uint256 max) internal returns (Point memory) {
-        return
-            Point(
-                int32(int256(randomUint(max))),
-                int32(int256(randomUint(max)))
-            );
-    }
-
-    // Return a point `(i, i)`
-    function pointInDiagonal(int256 i) internal returns (Point memory) {
+    function pointInDiagonal(int256 i) internal pure returns (Point memory) {
         return Point(int32(i), int32(i));
     }
 
-    function pointInDiagonal(uint256 i) internal returns (Point memory) {
+    function pointInDiagonal(uint256 i) internal pure returns (Point memory) {
         return pointInDiagonal(int256(i));
     }
 
-    // Insert points from `(a, a)` to `(b-1, b-1)`, inclusive
-    function insertMany(int256 a, int256 b) internal {
-        for (int256 i = a; i < b; i++) {
-            obj.insert(pointInDiagonal(i));
+    function randomInt32(int32 min, int32 max) internal returns (int32) {
+        rnd = keccak256(abi.encodePacked(rnd));
+        return int32(uint32(uint256(rnd)) % uint32(max - min)) + min;
+    }
+
+    function randomPoint() internal returns (Point memory) {
+        return
+            Point(
+                randomInt32(rect.min.x, rect.max.x),
+                randomInt32(rect.min.y, rect.max.y)
+            );
+    }
+
+    function newRandomPoint() internal returns (Point memory) {
+        Point memory point;
+        do {
+            point = randomPoint();
+        } while (obj.contains(point));
+        return point;
+    }
+
+    function newRandomPoints(uint256 units) internal returns (Point[] memory) {
+        Point[] memory points = new Point[](units);
+        for (uint256 i = 0; i < units; i++) {
+            points[i] = newRandomPoint();
+        }
+        return points;
+    }
+
+    function insertMany(uint256 units) internal {
+        for (uint256 i = 0; i < units; i++) {
+            Point memory point = randomPoint();
+            // Point memory point = newRandomPoint();
+            obj.insert(point);
         }
     }
 
-    function insertMany(uint256 a, uint256 b) internal {
-        insertMany(int256(a), int256(b));
-    }
-
-    function insertMany(uint256 i) internal {
-        uint256 size = obj.size();
-        insertMany(size, size + i);
-    }
-
-    // Insert `units` random points within a square of side `side` and origin `(0, 0)`
-    function populateSquare(uint256 side, uint256 units) internal {
-        for (uint256 i = 0; i < units; i++) {
-            Point memory point = randomPoint(side);
-            obj.insert(point);
+    function insertPoints(Point[] memory points) internal {
+        for (uint256 i = 0; i < points.length; i++) {
+            obj.insert(points[i]);
         }
     }
 }
