@@ -105,11 +105,14 @@ abstract contract ObjBench is Test {
 
     function testBenchQuery() public {
         console.log("%s: Query", name);
-        uint8[5] memory percentages = [1, 5, 10, 25, 50];
-        for (uint256 i = 3; i < 8; i++) {
-            for (uint256 j = 2; j < i; j++) {
+        uint8[4] memory percentages = [1, 3, 9, 12];
+        // side exponent
+        for (uint256 i = 4; i < 9; i++) {
+            // query exponent
+            for (uint256 j = 3; j < i - 1; j++) {
+                // percentage index
                 for (uint256 k = 0; k < percentages.length; k++) {
-                    benchQuery(2**i, percentages[k], 2 ** j);
+                    benchQuery(2**i, percentages[k], 2**j);
                     reset();
                 }
             }
