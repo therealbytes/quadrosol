@@ -18,7 +18,7 @@ abstract contract ObjBench is Test {
     uint256 internal constant RUNS = 32;
 
     function setUp() public virtual {
-        reset(1024);
+        reset(256);
     }
 
     function reset(uint256 side) internal virtual {
@@ -70,21 +70,15 @@ abstract contract ObjBench is Test {
     // TODO: benchContainsNo
     // TODO: naming
 
-    function benchQuery(
-        uint256 side,
-        uint256 pm,
-        uint256 query
-    ) internal {
-        reset(side);
-        uint256 units = (side**2 * pm) / 1000;
+    function benchQuery(uint256 pm, uint256 query) internal {
+        uint256 units = (area(rect) * pm) / 1000;
         insertMany(units);
         Rect memory queryRect = Rect(Point(0, 0), pointInDiagonal(query));
         startGasMetering();
         Point[] memory points = obj.searchRect(queryRect);
         uint256 gas = endGasMetering();
-        console.log("Query-%d-%d-%d", side, pm, query);
-        console.log("Gas: %d", gas);
-        // console.log(side, pm, query, gas);
+        console.log("Query-%d-%d: %d", pm, query, gas);
+        console.log(pm, query, gas);
     }
 
     function testBenchInsert() public {
@@ -111,26 +105,29 @@ abstract contract ObjBench is Test {
         }
     }
 
-    function testBenchQuerySmall() public {
-        console.log("%s: Query Small", name);
-        uint8[4] memory percentages = [1, 3, 9, 12];
-        // side exponent
-        for (uint256 i = 4; i < 9; i++) {
+    function testBenchQuery256Dense() public {
+        console.log("%s: Query", name);
+        // percentage index
+        for (uint256 i = 0; i < 3; i++) {
             // query exponent
-            for (uint256 j = 3; j < i - 1; j++) {
-                // percentage index
-                for (uint256 k = 0; k < percentages.length; k++) {
-                    benchQuery(2**i, percentages[k] * 10, 2**j);
-                    // reset();
-                }
+            for (uint256 j = 3; j < 7; j++) {
+                benchQuery(3**i * 10, 2**j);
+                reset();
             }
         }
     }
-
-    function testBenchQueryBig() public {
-        console.log("%s: Query Big", name);
-        benchQuery(2048, 1, 64);
-        // reset();
+    
+    function testBenchQuery1024Sparse() public {
+        reset(1024);
+        console.log("%s: Query", name);
+        // percentage index
+        for (uint256 i = 0; i < 3; i++) {
+            // query exponent
+            for (uint256 j = 5; j < 9; j++) {
+                benchQuery(3**i, 2**j);
+                reset();
+            }
+        }
     }
 
     // ================== Helpers ==================
@@ -192,6 +189,13 @@ abstract contract ObjBench is Test {
         for (uint256 i = 0; i < points.length; i++) {
             obj.insert(points[i]);
         }
+    }
+
+    // For some reason, importing RectLib makes forge not find the tests
+    function area(Rect memory rect) public pure returns (uint256) {
+        return
+            uint256(int256(rect.max.x - rect.min.x)) *
+            uint256(int256(rect.max.y - rect.min.y));
     }
 }
 
