@@ -11,7 +11,12 @@ struct SpatialSet {
 
 library SpatialSetLib {
     using PointLib for Point;
+    using PointsLib for Point[];
     using RectLib for Rect;
+
+    bool internal constant EXPAND_ARRAYS = false;
+    bool internal constant USE_SIZE_GUESSES = false;
+    uint256 internal constant SIZE_GUESS_RATIO_T10 = 15;
 
     function size(SpatialSet storage ss) public view returns (uint256) {
         return ss.set.size();
@@ -63,6 +68,20 @@ library SpatialSetLib {
         return Point(x, y);
     }
 
+    function addPointMatch(Point[] memory points, Point memory point, uint256 count)
+        internal
+        pure
+        returns (Point[] memory)
+    {
+        if (EXPAND_ARRAYS && count == points.length && count > 0) {
+            points = points.expand();
+        }
+        if (count < points.length) {
+            points[count] = point;
+        }
+        return points;
+    }
+
     function searchRect(
         SpatialSet storage ss,
         Rect memory rect
@@ -73,32 +92,63 @@ library SpatialSetLib {
             return points;
         }
 
-        uint256 count = 0;
         uint256 setSize = ss.set.size();
         uint256 searchArea = rect.area();
 
-        if (49 * setSize < 37 * searchArea) {
-            // Check every point in the set
-            points = new Point[](setSize);
-            for (uint256 i = 0; i < setSize; i++) {
-                (bool ok, uint256 data) = ss.set.getItem(i);
-                Point memory point = decodePoint(data);
-                if (rect.contains(point)) {
-                    points[count] = point;
-                    count++;
-                }
-            }
+        // The size of the array to put points in
+        uint256 arraySize;
+        // Number of points in the tree within rect
+        uint256 count;
+        // Maximum possible count
+        uint256 maxCount = MathUtilsLib.min(setSize, searchArea);
+        // Uniform distribution expected count times a ratio
+        uint256 consCountGuess = 1 + (SIZE_GUESS_RATIO_T10 *
+            (setSize * searchArea)) /
+            ss.rect.area() /
+            10;
+
+        if (USE_SIZE_GUESSES && consCountGuess < maxCount) {
+            // Set the array size to a conservative guess
+            arraySize = consCountGuess;
         } else {
-            // Check every point in the search area
-            points = new Point[](searchArea);
-            for (int32 x = rect.min.x; x <= rect.max.x; x++) {
-                for (int32 y = rect.min.y; y <= rect.max.y; y++) {
-                    Point memory point = Point(x, y);
-                    if (ss.set.has(encodePoint(point))) {
-                        points[count] = point;
+            // Set the array size to the maximum possible
+            arraySize = maxCount;
+        }
+
+        // We search once. If the array is too small, we keep counting and search again
+        // with an array of the correct size.
+        for (uint256 l = 0; l < 2; l++) {
+
+            points = new Point[](arraySize);
+
+            if (49 * setSize < 37 * searchArea) {
+                // Check every point in the set
+                for (uint256 i = 0; i < setSize; i++) {
+                    (bool ok, uint256 data) = ss.set.getItem(i);
+                    Point memory point = decodePoint(data);
+                    if (rect.contains(point)) {
+                        // Re-assign points as array might have been resized
+                        points = addPointMatch(points, point, count);
                         count++;
                     }
                 }
+            } else {
+                // Check every point in the search area
+                for (int32 x = rect.min.x; x <= rect.max.x; x++) {
+                    for (int32 y = rect.min.y; y <= rect.max.y; y++) {
+                        Point memory point = Point(x, y);
+                        if (ss.set.has(encodePoint(point))) {
+                            points = addPointMatch(points, point, count);
+                            count++;
+                        }
+                    }
+                }
+            }
+
+            if (count > points.length) {
+                arraySize = count;
+            } else {
+                break;
             }
         }
 
@@ -106,6 +156,7 @@ library SpatialSetLib {
             // resize array
             mstore(points, count)
         }
+
         return points;
     }
 
