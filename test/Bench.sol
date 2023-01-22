@@ -123,7 +123,7 @@ abstract contract ObjBench is Test {
         // percentage exponent
         for (uint256 i = 0; i < 3; i++) {
             // query exponent
-            for (uint256 j = 3; j < 7; j++) {
+            for (uint256 j = 2; j < 7; j++) {
                 benchSearchRect(3**i * 10, 2**j);
                 reset();
             }
@@ -136,7 +136,7 @@ abstract contract ObjBench is Test {
         // percentage exponent
         for (uint256 i = 0; i < 3; i++) {
             // query exponent
-            for (uint256 j = 5; j < 9; j++) {
+            for (uint256 j = 2; j < 9; j++) {
                 benchSearchRect(3**i, 2**j);
                 reset();
             }
