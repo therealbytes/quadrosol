@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "./Geo.sol";
 
-import {IIndex} from "./IIndex.sol";
+import {IIndex} from "./interfaces/IIndex.sol";
 
 // TODO: Experiment with size tracking
 struct Node {
