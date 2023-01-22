@@ -67,7 +67,7 @@ abstract contract ObjTest is Test {
         assertTrue(pointEq(point, p2));
     }
 
-    function pointEq(Point memory a, Point memory b) internal returns (bool) {
+    function pointEq(Point memory a, Point memory b) internal pure returns (bool) {
         return a.x == b.x && a.y == b.y;
     }
 }
