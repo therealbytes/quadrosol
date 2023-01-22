@@ -6,6 +6,10 @@ struct Point {
     int32 y;
 }
 
+// struct Points {
+//     Point[] arr;
+// }
+
 struct Rect {
     Point min;
     Point max;
@@ -53,6 +57,25 @@ library PointLib {
             uint256(
                 int256((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y))
             );
+    }
+}
+
+library PointsLib {
+    function expand(
+        Point[] memory points,
+        uint256 r
+    ) public pure returns (Point[] memory) {
+        Point[] memory newPoints = new Point[](points.length * r);
+        for (uint256 i = 0; i < points.length; i++) {
+            newPoints[i] = points[i];
+        }
+        return newPoints;
+    }
+
+    function expand(
+        Point[] memory points
+    ) public pure returns (Point[] memory) {
+        return expand(points, 2);
     }
 }
 

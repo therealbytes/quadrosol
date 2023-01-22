@@ -19,9 +19,12 @@ struct QuadTree {
 
 library NodeLib {
     using PointLib for Point;
+    using PointsLib for Point[];
     using RectLib for Rect;
 
     uint256 internal constant NODE_POINTS = 4;
+    // Wether to expand point arrays when they are full and there are
+    bool internal constant EXPAND_ARRAYS = true;
 
     function isLeaf(Node storage node) public view returns (bool) {
         return !node.isInternal;
@@ -108,28 +111,29 @@ library NodeLib {
         Rect memory queryRect,
         Point[] memory points,
         uint256 count
-    ) public view returns (uint256) {
+    ) public view returns (uint256, Point[] memory) {
+        // Points is returned as it may be expanded
         if (isLeaf(node)) {
             for (uint256 i = 0; i < node.points.length; i++) {
                 if (queryRect.contains(node.points[i])) {
+                    // If points.length is 0, this will never be true
+                    // We can still use it to count the number of points in the rect
+                    if (EXPAND_ARRAYS && count == points.length && count > 0) {
+                        points = points.expand();
+                    }
                     if (count < points.length) {
-                        // We do this so we can search with an array of length 0
-                        // to count the number of points
                         points[count] = node.points[i];
                     }
+                    // Count even if the array is full or length 0
                     count++;
-                    // If point.length is 0, we are just counting so we shouldn't stop
-                    if (count == points.length) {
-                        break;
-                    }
                 }
             }
-            return count;
+            return (count, points);
         } else {
             for (uint256 i = 0; i < 4; i++) {
                 Quadrant q = Quadrant(i);
                 if (queryRect.intersects(rect.quadrant(q))) {
-                    count = searchRect(
+                    (count, points) = searchRect(
                         node.children[q],
                         rect.quadrant(q),
                         queryRect,
@@ -141,7 +145,7 @@ library NodeLib {
                     }
                 }
             }
-            return count;
+            return (count, points);
         }
     }
 
@@ -152,15 +156,7 @@ library NodeLib {
         Point memory nearestPoint,
         uint256 minDistanceSq,
         bool haveNearest
-    )
-        public
-        view
-        returns (
-            Point memory,
-            uint256,
-            bool
-        )
-    {
+    ) public view returns (Point memory, uint256, bool) {
         if (isLeaf(node)) {
             for (uint256 i = 0; i < node.points.length; i++) {
                 uint256 d = point.distanceSq(node.points[i]);
@@ -215,14 +211,22 @@ library QuadTreeLib {
     using RectLib for Rect;
     using NodeLib for Node;
 
+    // Wether to use size guesses to allocate arrays when the expected point count
+    // returned by a query is way smaller than the theoretical maximum.
+    // This is useful when the the query space is large and the tree is large and sparse.
+    bool internal constant USE_SIZE_GUESSES = true;
+    // Size guesses are the number of points expected from a uniform distribution times
+    // this ratio divided by 10.
+    uint256 internal constant SIZE_GUESS_RATIO_T10 = 15;
+
     function size(QuadTree storage qt) public view returns (uint256) {
         return qt._size;
     }
 
-    function insert(QuadTree storage qt, Point memory point)
-        public
-        returns (bool)
-    {
+    function insert(
+        QuadTree storage qt,
+        Point memory point
+    ) public returns (bool) {
         if (!qt.rect.contains(point)) {
             return false;
         }
@@ -233,10 +237,10 @@ library QuadTreeLib {
         return false;
     }
 
-    function remove(QuadTree storage qt, Point memory point)
-        public
-        returns (bool)
-    {
+    function remove(
+        QuadTree storage qt,
+        Point memory point
+    ) public returns (bool) {
         if (!qt.rect.contains(point)) {
             return false;
         }
@@ -247,43 +251,62 @@ library QuadTreeLib {
         return false;
     }
 
-    function contains(QuadTree storage qt, Point memory point)
-        public
-        view
-        returns (bool)
-    {
+    function contains(
+        QuadTree storage qt,
+        Point memory point
+    ) public view returns (bool) {
         if (!qt.rect.contains(point)) {
             return false;
         }
         return qt.root.contains(qt.rect, point);
     }
 
-    function searchRect(QuadTree storage qt, Rect memory rect)
-        public
-        view
-        returns (Point[] memory)
-    {
+    function searchRect(
+        QuadTree storage qt,
+        Rect memory rect
+    ) public view returns (Point[] memory) {
         Point[] memory points;
-        uint256 arraySize;
-
         if (!qt.rect.intersects(rect)) {
             return points;
         }
 
-        // Assuming uniform distribution
-        // uint256 expectedPoints = (qt._size * rect.area()) / qt.rect.area();
+        // Number of points in the tree within rect
+        uint256 count;
+        // Maximum possible count
+        uint256 maxCount = MathUtilsLib.min(qt._size, rect.area());
+        // Uniform distribution expected count times a ratio
+        uint256 consCountGuess = (SIZE_GUESS_RATIO_T10 *
+            (qt._size * rect.area())) /
+            qt.rect.area() /
+            10;
+        // The size of the array to put points in
+        uint256 arraySize;
 
-        if (false) {
-            arraySize = qt.root.searchRect(qt.rect, rect, new Point[](0), 0);
-            if (arraySize == 0) {
-                return points;
-            }
+        if (USE_SIZE_GUESSES && consCountGuess < maxCount) {
+            // Set the array size to a conservative guess
+            arraySize = consCountGuess;
         } else {
-            arraySize = MathUtilsLib.min(qt._size, rect.area());
+            // Set the array size to the maximum possible
+            arraySize = maxCount;
         }
 
-        points = new Point[](arraySize);
-        uint256 count = qt.root.searchRect(qt.rect, rect, points, 0);
+        // Even if the array is too small, the count is correct
+        (count, points) = qt.root.searchRect(
+            qt.rect,
+            rect,
+            new Point[](arraySize),
+            0
+        );
+        // If the array is not dynamically sized, it might be too small
+        if (count > points.length) {
+            // Create a new array with the correct size and search again
+            (count, points) = qt.root.searchRect(
+                qt.rect,
+                rect,
+                new Point[](count),
+                0
+            );
+        }
 
         assembly {
             // resize array
@@ -304,11 +327,10 @@ library QuadTreeLib {
         return (nearestPoint, haveNearest);
     }
 
-    function nearest(QuadTree storage qt, Point memory point)
-        public
-        view
-        returns (Point memory, bool)
-    {
-        return nearest(qt, point, 2**32 - 1);
+    function nearest(
+        QuadTree storage qt,
+        Point memory point
+    ) public view returns (Point memory, bool) {
+        return nearest(qt, point, 2 ** 32 - 1);
     }
 }
