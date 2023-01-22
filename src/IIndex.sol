@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import {Point, Rect} from "../src/Geo.sol";
+import {Point, Rect} from "./Geo.sol";
 
-interface IObj {
+interface IIndex {
     function size() external returns (uint256);
 
     function insert(Point memory point) external returns (bool);

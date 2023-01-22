@@ -3,6 +3,8 @@ pragma solidity ^0.8.0;
 
 import "./Geo.sol";
 
+import {IIndex} from "./IIndex.sol";
+
 // TODO: Experiment with size tracking
 struct Node {
     bool isInternal;
@@ -277,8 +279,8 @@ library QuadTreeLib {
         // Maximum possible count
         uint256 maxCount = MathUtilsLib.min(qt._size, rect.area());
         // Uniform distribution expected count times a ratio
-        uint256 consCountGuess = 1 + (SIZE_GUESS_RATIO_T10 *
-            (qt._size * rect.area())) /
+        uint256 consCountGuess = 1 +
+            (SIZE_GUESS_RATIO_T10 * (qt._size * rect.area())) /
             qt.rect.area() /
             10;
 
@@ -332,5 +334,43 @@ library QuadTreeLib {
         Point memory point
     ) public view returns (Point memory, bool) {
         return nearest(qt, point, 2 ** 32 - 1);
+    }
+}
+
+contract QuadTreeObj is IIndex {
+    using QuadTreeLib for QuadTree;
+
+    QuadTree internal tree;
+
+    constructor(Rect memory rect) {
+        tree.rect = rect;
+    }
+
+    function size() external view returns (uint256) {
+        return tree.size();
+    }
+
+    function insert(Point memory point) external returns (bool) {
+        return tree.insert(point);
+    }
+
+    function remove(Point memory point) external returns (bool) {
+        return tree.remove(point);
+    }
+
+    function contains(Point memory point) external view returns (bool) {
+        return tree.contains(point);
+    }
+
+    function searchRect(
+        Rect memory rect
+    ) external view returns (Point[] memory) {
+        return tree.searchRect(rect);
+    }
+
+    function nearest(
+        Point memory point
+    ) external view returns (Point memory, bool) {
+        return tree.nearest(point);
     }
 }

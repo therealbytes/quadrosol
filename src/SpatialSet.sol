@@ -4,6 +4,8 @@ pragma solidity ^0.8.0;
 import "./Geo.sol";
 import "./Set.sol";
 
+import {IIndex} from "./IIndex.sol";
+
 struct SpatialSet {
     Set set;
     Rect rect;
@@ -68,11 +70,11 @@ library SpatialSetLib {
         return Point(x, y);
     }
 
-    function addPointMatch(Point[] memory points, Point memory point, uint256 count)
-        internal
-        pure
-        returns (Point[] memory)
-    {
+    function addPointMatch(
+        Point[] memory points,
+        Point memory point,
+        uint256 count
+    ) internal pure returns (Point[] memory) {
         if (EXPAND_ARRAYS && count == points.length && count > 0) {
             points = points.expand();
         }
@@ -102,8 +104,8 @@ library SpatialSetLib {
         // Maximum possible count
         uint256 maxCount = MathUtilsLib.min(setSize, searchArea);
         // Uniform distribution expected count times a ratio
-        uint256 consCountGuess = 1 + (SIZE_GUESS_RATIO_T10 *
-            (setSize * searchArea)) /
+        uint256 consCountGuess = 1 +
+            (SIZE_GUESS_RATIO_T10 * (setSize * searchArea)) /
             ss.rect.area() /
             10;
 
@@ -117,8 +119,7 @@ library SpatialSetLib {
 
         // We search once. If the array is too small, we keep counting and search again
         // with an array of the correct size.
-        for (uint256 l = 0; l < 2; l++) {
-
+        for (uint256 s = 0; s < 2; s++) {
             points = new Point[](arraySize);
 
             if (49 * setSize < 37 * searchArea) {
@@ -194,5 +195,44 @@ library SpatialSetLib {
         Point memory point
     ) public view returns (Point memory, bool) {
         return nearest(ss, point, 2 ** 32 - 1);
+    }
+}
+
+contract SpatialSetObj is IIndex {
+    using SpatialSetLib for SpatialSet;
+
+    SpatialSet internal set;
+
+    constructor(Rect memory rect) {
+        set.rect = rect;
+        set.set = new Set();
+    }
+
+    function size() external view returns (uint256) {
+        return set.size();
+    }
+
+    function insert(Point memory point) external returns (bool) {
+        return set.insert(point);
+    }
+
+    function remove(Point memory point) external returns (bool) {
+        return set.remove(point);
+    }
+
+    function contains(Point memory point) external view returns (bool) {
+        return set.contains(point);
+    }
+
+    function searchRect(
+        Rect memory rect
+    ) external view returns (Point[] memory) {
+        return set.searchRect(rect);
+    }
+
+    function nearest(
+        Point memory point
+    ) external view returns (Point memory, bool) {
+        return set.nearest(point);
     }
 }

@@ -2,16 +2,17 @@
 pragma solidity >=0.8.0;
 
 import "forge-std/Test.sol";
-import "./IObj.sol";
 
-import {QuadTreeObj} from "./QuadTree.sol";
-import {SpatialSetObj} from "./SpatialSet.sol";
+import {Point, Rect} from "../src/Geo.sol";
+import {IIndex} from "../src/IIndex.sol";
+import {QuadTreeObj} from "../src/QuadTree.sol";
+import {SpatialSetObj} from "../src/SpatialSet.sol";
 
 abstract contract ObjBench is Test {
     bytes32 internal rnd;
     uint256 internal gu;
 
-    IObj internal obj;
+    IIndex internal obj;
     Rect internal rect;
     string internal name;
 
