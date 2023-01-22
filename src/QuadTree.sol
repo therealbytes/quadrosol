@@ -5,11 +5,9 @@ import "./Geo.sol";
 
 import {IIndex} from "./interfaces/IIndex.sol";
 
-// TODO: Experiment with size tracking
 struct Node {
     bool isInternal;
     mapping(Quadrant => Node) children;
-    // TODO: How is this laid out in storage?
     Point[] points;
 }
 
