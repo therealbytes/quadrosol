@@ -20,6 +20,12 @@ library SpatialSetLib {
     bool internal constant USE_SIZE_GUESSES = false;
     uint256 internal constant SIZE_GUESS_RATIO_T10 = 15;
 
+    function init(SpatialSet storage ss, Rect memory rect) public {
+        require(address(ss.set) == address(0), "Already initialized");
+        ss.set = new Set();
+        ss.rect = rect;
+    }
+
     function size(SpatialSet storage ss) public view returns (uint256) {
         return ss.set.size();
     }
@@ -56,32 +62,6 @@ library SpatialSetLib {
         Point memory point
     ) public view returns (bool) {
         return ss.set.has(encodePoint(point));
-    }
-
-    function encodePoint(Point memory point) internal pure returns (uint256) {
-        uint256 data = uint256(int256(point.x));
-        data = (data << 32) | uint256(int256(point.y));
-        return data;
-    }
-
-    function decodePoint(uint256 data) internal pure returns (Point memory) {
-        int32 y = int32(int256(data & (2 ** 32 - 1)));
-        int32 x = int32(int256(data >> 32));
-        return Point(x, y);
-    }
-
-    function addPointMatch(
-        Point[] memory points,
-        Point memory point,
-        uint256 count
-    ) internal pure returns (Point[] memory) {
-        if (EXPAND_ARRAYS && count == points.length && count > 0) {
-            points = points.expand();
-        }
-        if (count < points.length) {
-            points[count] = point;
-        }
-        return points;
     }
 
     function searchRect(
@@ -196,6 +176,32 @@ library SpatialSetLib {
     ) public view returns (Point memory, bool) {
         return nearest(ss, point, 2 ** 32 - 1);
     }
+
+    function encodePoint(Point memory point) internal pure returns (uint256) {
+        uint256 data = uint256(int256(point.x));
+        data = (data << 32) | uint256(int256(point.y));
+        return data;
+    }
+
+    function decodePoint(uint256 data) internal pure returns (Point memory) {
+        int32 y = int32(int256(data & (2 ** 32 - 1)));
+        int32 x = int32(int256(data >> 32));
+        return Point(x, y);
+    }
+
+    function addPointMatch(
+        Point[] memory points,
+        Point memory point,
+        uint256 count
+    ) internal pure returns (Point[] memory) {
+        if (EXPAND_ARRAYS && count == points.length && count > 0) {
+            points = points.expand();
+        }
+        if (count < points.length) {
+            points[count] = point;
+        }
+        return points;
+    }
 }
 
 contract SpatialSetObj is IIndex {
@@ -204,8 +210,7 @@ contract SpatialSetObj is IIndex {
     SpatialSet internal set;
 
     constructor(Rect memory rect) {
-        set.rect = rect;
-        set.set = new Set();
+        set.init(rect);
     }
 
     function size() external view returns (uint256) {

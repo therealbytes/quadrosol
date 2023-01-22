@@ -221,6 +221,11 @@ library QuadTreeLib {
     // this ratio divided by 10.
     uint256 internal constant SIZE_GUESS_RATIO_T10 = 15;
 
+    function init(QuadTree storage qt, Rect memory rect) public {
+        require(qt._size == 0, "Not empty");
+        qt.rect = rect;
+    }
+
     function size(QuadTree storage qt) public view returns (uint256) {
         return qt._size;
     }
@@ -343,7 +348,7 @@ contract QuadTreeObj is IIndex {
     QuadTree internal tree;
 
     constructor(Rect memory rect) {
-        tree.rect = rect;
+        tree.init(rect);
     }
 
     function size() external view returns (uint256) {
