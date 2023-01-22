@@ -30,12 +30,13 @@ abstract contract ObjBench is Test {
 
     function benchInsert(uint256 units) internal {
         insertMany(units);
+        uint256 startingSize = obj.size();
         Point[] memory points = newRandomPoints(RUNS);
         startGasMetering();
         insertPoints(points);
         uint256 gas = endGasMetering() / RUNS;
         console.log("Insert-%d: %d", units, gas);
-        assertEq(obj.size(), units + RUNS);
+        assertEq(obj.size(), startingSize + RUNS);
     }
 
     function benchRemove(uint256 units) internal {
@@ -46,13 +47,14 @@ abstract contract ObjBench is Test {
         }
         Point[] memory points = newRandomPoints(runs);
         insertPoints(points);
+        uint256 startingSize = obj.size();
         startGasMetering();
         for (uint256 i = 0; i < runs; i++) {
             obj.remove(points[i]);
         }
         uint256 gas = endGasMetering() / runs;
         console.log("Remove-%d: %d", units, gas);
-        assertEq(obj.size(), units);
+        assertEq(obj.size(), startingSize - runs);
     }
 
     function benchContainsYes(uint256 units) internal {
