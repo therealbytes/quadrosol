@@ -224,10 +224,10 @@ abstract contract ObjBench is Test {
     }
 
     // For some reason, importing RectLib makes forge not find the tests
-    function area(Rect memory rect) public pure returns (uint256) {
+    function area(Rect memory _rect) public pure returns (uint256) {
         return
-            uint256(int256(rect.max.x - rect.min.x)) *
-            uint256(int256(rect.max.y - rect.min.y));
+            uint256(int256(_rect.max.x - _rect.min.x)) *
+            uint256(int256(_rect.max.y - _rect.min.y));
     }
 }
 
