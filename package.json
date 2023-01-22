@@ -8,6 +8,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "test": "forge test -vv --match-path test/Test.sol",
+    "benchmark": "forge test -vv --match-path test/Bench.sol --gas-report",
     "lint": "yarn prettier && yarn solhint",
     "prettier": "prettier --write 'src/**/*.sol'",
     "solhint": "solhint --config ./.solhint.json 'src/**/*.sol' --fix"
