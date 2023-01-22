@@ -49,6 +49,10 @@ library MathUtilsLib {
 }
 
 library PointLib {
+    function eq(Point memory a, Point memory b) public pure returns (bool) {
+        return a.x == b.x && a.y == b.y;
+    }
+
     function distanceSq(
         Point memory a,
         Point memory b
@@ -57,6 +61,17 @@ library PointLib {
             uint256(
                 int256((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y))
             );
+    }
+
+    function encode(Point memory point) internal pure returns (uint256) {
+        uint256 data = uint256(int256(point.x));
+        data = (data << 32) | uint256(int256(point.y));
+        return data;
+    }
+
+    function decode(Point memory point, uint256 data) internal pure {
+        point.y = int32(int256(data & (2**32 - 1)));
+        point.x = int32(int256(data >> 32));
     }
 }
 
@@ -80,6 +95,12 @@ library PointsLib {
 }
 
 library RectLib {
+    using PointLib for Point;
+
+    function eq(Rect memory a, Rect memory b) public pure returns (bool) {
+        return PointLib.eq(a.min, b.min) && PointLib.eq(a.max, b.max);
+    }
+
     function contains(
         Rect memory rect,
         Point memory point
@@ -91,7 +112,12 @@ library RectLib {
             point.y < rect.max.y;
     }
 
-    // TODO: wording -- intersects or overlaps?
+    function area(Rect memory rect) public pure returns (uint256) {
+        return
+            uint256(int256(rect.max.x - rect.min.x)) *
+            uint256(int256(rect.max.y - rect.min.y));
+    }
+
     function intersects(
         Rect memory rect,
         Rect memory other
@@ -101,6 +127,26 @@ library RectLib {
             other.min.x < rect.max.x &&
             rect.min.y < other.max.y &&
             other.min.y < rect.max.y;
+    }
+
+    function overlap(
+        Rect memory rect,
+        Rect memory other
+    ) public pure returns (Rect memory) {
+        Rect memory overlapRect = Rect({
+                min: Point({
+                    x: MathUtilsLib.maxInt32(rect.min.x, other.min.x),
+                    y: MathUtilsLib.maxInt32(rect.min.y, other.min.y)
+                }),
+                max: Point({
+                    x: MathUtilsLib.minInt32(rect.max.x, other.max.x),
+                    y: MathUtilsLib.minInt32(rect.max.y, other.max.y)
+                })
+            });
+        if (overlapRect.min.x >= overlapRect.max.x || overlapRect.min.y >= overlapRect.max.y) {
+            return Rect({min: Point({x: 0, y: 0}), max: Point({x: 0, y: 0})});
+        }
+        return overlapRect;
     }
 
     function distanceSq(
@@ -163,11 +209,5 @@ library RectLib {
                 return Quadrant.BOTTOM_RIGHT;
             }
         }
-    }
-
-    function area(Rect memory rect) public pure returns (uint256) {
-        return
-            uint256(int256(rect.max.x - rect.min.x)) *
-            uint256(int256(rect.max.y - rect.min.y));
     }
 }
