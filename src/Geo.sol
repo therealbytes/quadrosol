@@ -65,7 +65,7 @@ library PointsLib {
         Point[] memory points,
         uint256 r
     ) public pure returns (Point[] memory) {
-        Point[] memory newPoints = new Point[](points.length * r);
+        Point[] memory newPoints = new Point[](points.length * r + 1);
         for (uint256 i = 0; i < points.length; i++) {
             newPoints[i] = points[i];
         }
