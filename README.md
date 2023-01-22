@@ -50,5 +50,6 @@ yarn benchmark
 ## TODO
 
 - Generalize `nearest` query to `nearestK`
+- Add alternative distance functions e.g. manhattan
 - Add `searchCircle`
 - Add `replace` method
