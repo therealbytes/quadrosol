@@ -270,17 +270,17 @@ library QuadTreeLib {
             return points;
         }
 
+        // The size of the array to put points in
+        uint256 arraySize;
         // Number of points in the tree within rect
         uint256 count;
         // Maximum possible count
         uint256 maxCount = MathUtilsLib.min(qt._size, rect.area());
         // Uniform distribution expected count times a ratio
-        uint256 consCountGuess = (SIZE_GUESS_RATIO_T10 *
+        uint256 consCountGuess = 1 + (SIZE_GUESS_RATIO_T10 *
             (qt._size * rect.area())) /
             qt.rect.area() /
             10;
-        // The size of the array to put points in
-        uint256 arraySize;
 
         if (USE_SIZE_GUESSES && consCountGuess < maxCount) {
             // Set the array size to a conservative guess
