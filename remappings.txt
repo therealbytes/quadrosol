@@ -1,0 +1,3 @@
+solecs/=./node_modules/@latticexyz/solecs/src/
+forge-std/=./node_modules/forge-std/
+@solidstate/=./node_modules/@solidstate/

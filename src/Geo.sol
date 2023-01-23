@@ -6,10 +6,6 @@ struct Point {
     int32 y;
 }
 
-// struct Points {
-//     Point[] arr;
-// }
-
 struct Rect {
     Point min;
     Point max;

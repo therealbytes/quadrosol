@@ -10,11 +10,15 @@
   "scripts": {
     "test": "forge test -vv --match-path test/Test.sol",
     "benchmark": "forge test -vv --match-path test/Bench.sol --gas-report",
+    "build": "forge build",
     "lint": "yarn prettier && yarn solhint",
     "prettier": "prettier --write 'src/**/*.sol'",
     "solhint": "solhint --config ./.solhint.json 'src/**/*.sol' --fix"
   },
   "devDependencies": {
+    "@latticexyz/solecs": "^1.33.1",
+    "@solidstate/contracts": "^0.0.52",
+    "forge-std": "^1.1.2",
     "prettier": "^2.6.2",
     "prettier-plugin-solidity": "^1.0.0-beta.19",
     "solhint": "^3.3.7"

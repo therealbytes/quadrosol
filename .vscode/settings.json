@@ -1,6 +1,6 @@
 {
   "solidity.remappings": [
-    "forge-std/=./lib/forge-std/src/",
-    "@solidstate/=./lib/solidstate-solidity/src/"
+    "solecs/=./node_modules/@latticexyz/solecs/src/",
+    "forge-std/=./node_modules/forge-std/"
   ]
 }
