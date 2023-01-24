@@ -20,6 +20,7 @@ abstract contract ObjTest is Test {
         Point memory point = Point(0, 0);
         assertTrue(obj.insert(point));
         assertFalse(obj.insert(point));
+        assertTrue(obj.size() == 1);
     }
 
     function testRemove() public {
@@ -27,6 +28,7 @@ abstract contract ObjTest is Test {
         assertTrue(obj.insert(point));
         assertTrue(obj.remove(point));
         assertFalse(obj.remove(point));
+        assertTrue(obj.size() == 0);
     }
 
     function testContains() public {
