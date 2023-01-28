@@ -16,14 +16,14 @@ abstract contract ObjTest is Test {
         rect = Rect(Point(-10, -10), Point(10, 10));
     }
 
-    function testInsert() public {
+    function testInsert() public virtual {
         Point memory point = Point(0, 0);
         assertTrue(obj.insert(point));
         assertFalse(obj.insert(point));
         assertTrue(obj.size() == 1);
     }
 
-    function testRemove() public {
+    function testRemove() public virtual {
         Point memory point = Point(0, 0);
         assertTrue(obj.insert(point));
         assertTrue(obj.remove(point));
@@ -31,14 +31,14 @@ abstract contract ObjTest is Test {
         assertTrue(obj.size() == 0);
     }
 
-    function testContains() public {
+    function testContains() public virtual {
         Point memory point = Point(0, 0);
         assertFalse(obj.contains(point));
         assertTrue(obj.insert(point));
         assertTrue(obj.contains(point));
     }
 
-    function testSearchRect() public {
+    function testSearchRect() public virtual {
         Point memory pIn0 = Point(0, 0);
         Point memory pIn1 = Point(1, 1);
         Point memory pOut0 = Point(5, 5);
@@ -56,7 +56,7 @@ abstract contract ObjTest is Test {
         }
     }
 
-    function testNearest() public {
+    function testNearest() public virtual {
         Point memory p0 = Point(0, 0);
         Point memory p1 = Point(1, 1);
         Point memory p2 = Point(5, 5);
