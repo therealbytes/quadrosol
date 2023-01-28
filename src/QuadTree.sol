@@ -282,14 +282,14 @@ library QuadTreeLib {
         // Maximum possible count
         uint256 maxCount = MathUtilsLib.min(qt._size, rect.area());
         // Uniform distribution expected count times a ratio
-        uint256 consCountGuess = 1 +
+        uint256 countGuess = 1 +
             (SIZE_GUESS_RATIO_T10 * (qt._size * rect.area())) /
             qt.rect.area() /
             10;
 
-        if (USE_SIZE_GUESSES && consCountGuess < maxCount) {
+        if (USE_SIZE_GUESSES && countGuess < maxCount) {
             // Set the array size to a conservative guess
-            arraySize = consCountGuess;
+            arraySize = countGuess;
         } else {
             // Set the array size to the maximum possible
             arraySize = maxCount;
