@@ -11,6 +11,11 @@ struct Rect {
     Point max;
 }
 
+struct Circle {
+    Point center;
+    int32 radius;
+}
+
 enum Quadrant {
     TOP_LEFT,
     TOP_RIGHT,
