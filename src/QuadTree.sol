@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./Geo.sol";
-
+import {Point, PointLib, PointsLib, Rect, RectLib, Quadrant} from "./Geo/Index.sol";
 import {IIndex} from "./interfaces/IIndex.sol";
+import {MathUtilsLib} from "./utils/MathUtilsLib.sol";
 
 struct Node {
     bool isInternal;

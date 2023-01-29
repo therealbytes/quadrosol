@@ -3,7 +3,7 @@ pragma solidity >=0.8.0;
 
 import "forge-std/Test.sol";
 
-import {Point, Rect} from "../src/Geo.sol";
+import {Point, Rect} from "../src/Geo/Index.sol";
 import {IIndex} from "../src/interfaces/IIndex.sol";
 import {QuadTreeObj} from "../src/QuadTree.sol";
 import {SpatialSetObj} from "../src/SpatialSet.sol";

@@ -1,98 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-struct Point {
-    int32 x;
-    int32 y;
-}
-
-struct Rect {
-    Point min;
-    Point max;
-}
-
-struct Circle {
-    Point center;
-    int32 radius;
-}
+import {Rect} from "./Rect.sol";
+import {PointLib, Point} from "./PointLib.sol";
+import {MathUtilsLib} from "../utils/MathUtilsLib.sol";
 
 enum Quadrant {
     TOP_LEFT,
     TOP_RIGHT,
     BOTTOM_LEFT,
     BOTTOM_RIGHT
-}
-
-library MathUtilsLib {
-    function max(uint256 a, uint256 b) public pure returns (uint256) {
-        return a > b ? a : b;
-    }
-
-    function min(uint256 a, uint256 b) public pure returns (uint256) {
-        return a < b ? a : b;
-    }
-
-    function max(int256 a, int256 b) public pure returns (int256) {
-        return a > b ? a : b;
-    }
-
-    function min(int256 a, int256 b) public pure returns (int256) {
-        return a < b ? a : b;
-    }
-
-    function maxInt32(int32 a, int32 b) public pure returns (int32) {
-        return a > b ? a : b;
-    }
-
-    function minInt32(int32 a, int32 b) public pure returns (int32) {
-        return a < b ? a : b;
-    }
-}
-
-library PointLib {
-    function eq(Point memory a, Point memory b) public pure returns (bool) {
-        return a.x == b.x && a.y == b.y;
-    }
-
-    function distanceSq(
-        Point memory a,
-        Point memory b
-    ) public pure returns (uint256) {
-        return
-            uint256(
-                int256((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y))
-            );
-    }
-
-    function encode(Point memory point) internal pure returns (uint256) {
-        uint256 data = uint256(int256(point.x));
-        data = (data << 32) | uint256(int256(point.y));
-        return data;
-    }
-
-    function decode(Point memory point, uint256 data) internal pure {
-        point.y = int32(int256(data & (2**32 - 1)));
-        point.x = int32(int256(data >> 32));
-    }
-}
-
-library PointsLib {
-    function expand(
-        Point[] memory points,
-        uint256 r
-    ) public pure returns (Point[] memory) {
-        Point[] memory newPoints = new Point[](points.length * r + 1);
-        for (uint256 i = 0; i < points.length; i++) {
-            newPoints[i] = points[i];
-        }
-        return newPoints;
-    }
-
-    function expand(
-        Point[] memory points
-    ) public pure returns (Point[] memory) {
-        return expand(points, 2);
-    }
 }
 
 library RectLib {
@@ -135,16 +52,19 @@ library RectLib {
         Rect memory other
     ) public pure returns (Rect memory) {
         Rect memory overlapRect = Rect({
-                min: Point({
-                    x: MathUtilsLib.maxInt32(rect.min.x, other.min.x),
-                    y: MathUtilsLib.maxInt32(rect.min.y, other.min.y)
-                }),
-                max: Point({
-                    x: MathUtilsLib.minInt32(rect.max.x, other.max.x),
-                    y: MathUtilsLib.minInt32(rect.max.y, other.max.y)
-                })
-            });
-        if (overlapRect.min.x >= overlapRect.max.x || overlapRect.min.y >= overlapRect.max.y) {
+            min: Point({
+                x: MathUtilsLib.maxInt32(rect.min.x, other.min.x),
+                y: MathUtilsLib.maxInt32(rect.min.y, other.min.y)
+            }),
+            max: Point({
+                x: MathUtilsLib.minInt32(rect.max.x, other.max.x),
+                y: MathUtilsLib.minInt32(rect.max.y, other.max.y)
+            })
+        });
+        if (
+            overlapRect.min.x >= overlapRect.max.x ||
+            overlapRect.min.y >= overlapRect.max.y
+        ) {
             return Rect({min: Point({x: 0, y: 0}), max: Point({x: 0, y: 0})});
         }
         return overlapRect;

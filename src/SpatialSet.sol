@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./Geo.sol";
-import "./Set.sol";
+import {Set} from "./Set.sol";
 
+import {Point, PointLib, PointsLib, Rect, RectLib} from "./Geo/Index.sol";
 import {IIndex} from "./interfaces/IIndex.sol";
 import {ISet, ISetRead} from "./interfaces/ISet.sol";
+import {MathUtilsLib} from "./utils/MathUtilsLib.sol";
 
 struct SpatialSet {
     ISet set;
@@ -21,11 +22,10 @@ library SpatialSetQueriesLib {
     bool internal constant USE_SIZE_GUESSES = false;
     uint256 internal constant SIZE_GUESS_RATIO_T10 = 15;
 
-    function contains(ISetRead set, Point memory point)
-        public
-        view
-        returns (bool)
-    {
+    function contains(
+        ISetRead set,
+        Point memory point
+    ) public view returns (bool) {
         return set.has(point.encode());
     }
 
@@ -140,12 +140,11 @@ library SpatialSetQueriesLib {
         return (nearestPoint, haveNearest);
     }
 
-    function nearest(ISet set, Point memory point)
-        public
-        view
-        returns (Point memory, bool)
-    {
-        return nearest(set, point, 2**32 - 1);
+    function nearest(
+        ISet set,
+        Point memory point
+    ) public view returns (Point memory, bool) {
+        return nearest(set, point, 2 ** 32 - 1);
     }
 
     function addPointMatch(
@@ -177,10 +176,10 @@ library SpatialSetLib {
         return ss.set.size();
     }
 
-    function insert(SpatialSet storage ss, Point memory point)
-        public
-        returns (bool)
-    {
+    function insert(
+        SpatialSet storage ss,
+        Point memory point
+    ) public returns (bool) {
         if (!ss.rect.contains(point)) {
             return false;
         }
@@ -192,10 +191,10 @@ library SpatialSetLib {
         return true;
     }
 
-    function remove(SpatialSet storage ss, Point memory point)
-        public
-        returns (bool)
-    {
+    function remove(
+        SpatialSet storage ss,
+        Point memory point
+    ) public returns (bool) {
         uint256 data = point.encode();
         if (!ss.set.has(data)) {
             return false;
@@ -204,35 +203,32 @@ library SpatialSetLib {
         return true;
     }
 
-    function contains(SpatialSet storage ss, Point memory point)
-        public
-        view
-        returns (bool)
-    {
+    function contains(
+        SpatialSet storage ss,
+        Point memory point
+    ) public view returns (bool) {
         return SpatialSetQueriesLib.contains(ss.set, point);
     }
 
-    function searchRect(SpatialSet storage ss, Rect memory rect)
-        public
-        view
-        returns (Point[] memory)
-    {
+    function searchRect(
+        SpatialSet storage ss,
+        Rect memory rect
+    ) public view returns (Point[] memory) {
         return SpatialSetQueriesLib.searchRect(ss.set, ss.rect, rect);
     }
 
-    function nearest(SpatialSet storage ss, Point memory point)
-        public
-        view
-        returns (Point memory, bool)
-    {
+    function nearest(
+        SpatialSet storage ss,
+        Point memory point
+    ) public view returns (Point memory, bool) {
         return SpatialSetQueriesLib.nearest(ss.set, point);
     }
 
-    function nearest(SpatialSet storage ss, Point memory point, uint256 maxDistance)
-        public
-        view
-        returns (Point memory, bool)
-    {
+    function nearest(
+        SpatialSet storage ss,
+        Point memory point,
+        uint256 maxDistance
+    ) public view returns (Point memory, bool) {
         return SpatialSetQueriesLib.nearest(ss.set, point, maxDistance);
     }
 }
@@ -262,19 +258,15 @@ contract SpatialSetObj is IIndex {
         return set.contains(point);
     }
 
-    function searchRect(Rect memory rect)
-        external
-        view
-        returns (Point[] memory)
-    {
+    function searchRect(
+        Rect memory rect
+    ) external view returns (Point[] memory) {
         return set.searchRect(rect);
     }
 
-    function nearest(Point memory point)
-        external
-        view
-        returns (Point memory, bool)
-    {
+    function nearest(
+        Point memory point
+    ) external view returns (Point memory, bool) {
         return set.nearest(point);
     }
 
