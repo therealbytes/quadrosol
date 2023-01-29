@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import {Point, Rect} from "../Geo/Index.sol";
+import {Point, Rect} from "../geo/Index.sol";
 
 interface IIndexRead {
     // Returns the number of points in the index.

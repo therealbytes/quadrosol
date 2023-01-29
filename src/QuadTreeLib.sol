@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Point, PointLib, PointsLib, Rect, RectLib, Quadrant} from "./Geo/Index.sol";
+import {Point, PointLib, PointsLib, Rect, RectLib, Quadrant} from "./geo/Index.sol";
 import {IIndex} from "./interfaces/IIndex.sol";
 import {MathUtilsLib} from "./utils/MathUtilsLib.sol";
 

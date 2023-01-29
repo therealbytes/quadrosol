@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {Set} from "./Set.sol";
 
-import {Point, PointLib, PointsLib, Rect, RectLib} from "./Geo/Index.sol";
+import {Point, PointLib, PointsLib, Rect, RectLib} from "./geo/Index.sol";
 import {IIndex} from "./interfaces/IIndex.sol";
 import {ISet, ISetRead} from "./interfaces/ISet.sol";
 import {MathUtilsLib} from "./utils/MathUtilsLib.sol";
