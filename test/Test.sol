@@ -73,6 +73,7 @@ abstract contract ObjTest is Test {
     function pointEq(Point memory a, Point memory b)
         internal
         pure
+        virtual
         returns (bool)
     {
         return a.x == b.x && a.y == b.y;

@@ -29,7 +29,7 @@ abstract contract ObjBench is Test {
 
     function reset() internal virtual;
 
-    function benchInsert(uint256 units) internal {
+    function benchInsert(uint256 units) internal virtual {
         insertMany(units);
         uint256 startingSize = obj.size();
         Point[] memory points = newRandomPoints(RUNS);
@@ -40,7 +40,7 @@ abstract contract ObjBench is Test {
         assertEq(obj.size(), startingSize + RUNS);
     }
 
-    function benchRemove(uint256 units) internal {
+    function benchRemove(uint256 units) internal virtual {
         insertMany(units);
         uint256 runs = RUNS;
         if (units < runs) {
@@ -58,7 +58,7 @@ abstract contract ObjBench is Test {
         assertEq(obj.size(), startingSize - runs);
     }
 
-    function benchContainsYes(uint256 units) internal {
+    function benchContainsYes(uint256 units) internal virtual {
         insertMany(units);
         Point[] memory points = newRandomPoints(RUNS);
         insertPoints(points);
@@ -72,7 +72,7 @@ abstract contract ObjBench is Test {
 
     // TODO: benchContainsNo
 
-    function benchSearchRect(uint256 pm, uint256 query) internal {
+    function benchSearchRect(uint256 pm, uint256 query) internal virtual {
         uint256 units = (area(rect) * pm) / 1000;
         insertMany(units);
         Rect memory queryRect = Rect(Point(0, 0), pointInDiagonal(query));
@@ -83,7 +83,7 @@ abstract contract ObjBench is Test {
         console.log(pm, query, gas);
     }
 
-    function benchNearest(uint256 pm) internal {
+    function benchNearest(uint256 pm) internal virtual {
         uint256 units = (area(rect) * pm) / 1000;
         insertMany(units);
         Point[] memory points = newRandomPoints(RUNS);
@@ -95,7 +95,7 @@ abstract contract ObjBench is Test {
         console.log("Nearest-%d: %d", pm, gas);
     }
 
-    function testBenchInsert() public {
+    function testBenchInsert() public virtual {
         console.log("%s: Insert", name);
         for (uint256 i = 0; i < 4; i++) {
             benchInsert(10**i);
@@ -103,7 +103,7 @@ abstract contract ObjBench is Test {
         }
     }
 
-    function testBenchRemove() public {
+    function testBenchRemove() public virtual {
         console.log("%s: Remove", name);
         for (uint256 i = 0; i < 4; i++) {
             benchRemove(10**i);
@@ -111,7 +111,7 @@ abstract contract ObjBench is Test {
         }
     }
 
-    function testBenchContains() public {
+    function testBenchContains() public virtual {
         console.log("%s: Contains", name);
         for (uint256 i = 0; i < 4; i++) {
             benchContainsYes(10**i);
@@ -119,7 +119,7 @@ abstract contract ObjBench is Test {
         }
     }
 
-    function testBenchSearchRect256Dense() public {
+    function testBenchSearchRect256Dense() public virtual {
         console.log("%s: SearchRect 256Dense", name);
         // percentage exponent
         for (uint256 i = 0; i < 3; i++) {
@@ -131,7 +131,7 @@ abstract contract ObjBench is Test {
         }
     }
 
-    function testBenchSearchRect1024Sparse() public {
+    function testBenchSearchRect1024Sparse() public virtual {
         reset(1024);
         console.log("%s: SearchRect 1024Sparse", name);
         // percentage exponent
@@ -144,7 +144,7 @@ abstract contract ObjBench is Test {
         }
     }
 
-    function testBenchNearest256Dense() public {
+    function testBenchNearest256Dense() public virtual {
         console.log("%s: Nearest 256Dense", name);
         // percentage exponent
         for (uint256 i = 0; i < 3; i++) {
@@ -153,7 +153,7 @@ abstract contract ObjBench is Test {
         }
     }
 
-    function testBenchNearest1024Sparse() public {
+    function testBenchNearest1024Sparse() public virtual {
         reset(1024);
         console.log("%s: Nearest 1024Sparse", name);
         // percentage exponent
@@ -165,28 +165,28 @@ abstract contract ObjBench is Test {
 
     // ================== Helpers ==================
 
-    function startGasMetering() internal {
+    function startGasMetering() internal virtual {
         gu = gasleft();
     }
 
-    function endGasMetering() internal view returns (uint256) {
+    function endGasMetering() internal view virtual returns (uint256) {
         return gu - gasleft();
     }
 
-    function pointInDiagonal(int256 i) internal pure returns (Point memory) {
+    function pointInDiagonal(int256 i) internal pure virtual returns (Point memory) {
         return Point(int32(i), int32(i));
     }
 
-    function pointInDiagonal(uint256 i) internal pure returns (Point memory) {
+    function pointInDiagonal(uint256 i) internal pure virtual returns (Point memory) {
         return pointInDiagonal(int256(i));
     }
 
-    function randomInt32(int32 min, int32 max) internal returns (int32) {
+    function randomInt32(int32 min, int32 max) internal virtual returns (int32) {
         rnd = keccak256(abi.encodePacked(rnd));
         return int32(uint32(uint256(rnd)) % uint32(max - min)) + min;
     }
 
-    function randomPoint() internal returns (Point memory) {
+    function randomPoint() internal virtual returns (Point memory) {
         return
             Point(
                 randomInt32(rect.min.x, rect.max.x),
@@ -194,7 +194,7 @@ abstract contract ObjBench is Test {
             );
     }
 
-    function newRandomPoint() internal returns (Point memory) {
+    function newRandomPoint() internal virtual returns (Point memory) {
         Point memory point;
         do {
             point = randomPoint();
@@ -202,7 +202,7 @@ abstract contract ObjBench is Test {
         return point;
     }
 
-    function newRandomPoints(uint256 units) internal returns (Point[] memory) {
+    function newRandomPoints(uint256 units) internal virtual returns (Point[] memory) {
         Point[] memory points = new Point[](units);
         for (uint256 i = 0; i < units; i++) {
             points[i] = newRandomPoint();
@@ -210,7 +210,7 @@ abstract contract ObjBench is Test {
         return points;
     }
 
-    function insertMany(uint256 units) internal {
+    function insertMany(uint256 units) internal virtual {
         for (uint256 i = 0; i < units; i++) {
             Point memory point = randomPoint();
             // Point memory point = newRandomPoint();
@@ -218,14 +218,14 @@ abstract contract ObjBench is Test {
         }
     }
 
-    function insertPoints(Point[] memory points) internal {
+    function insertPoints(Point[] memory points) internal virtual {
         for (uint256 i = 0; i < points.length; i++) {
             obj.insert(points[i]);
         }
     }
 
     // For some reason, importing RectLib makes forge not find the tests
-    function area(Rect memory _rect) public pure returns (uint256) {
+    function area(Rect memory _rect) public pure virtual returns (uint256) {
         return
             uint256(int256(_rect.max.x - _rect.min.x)) *
             uint256(int256(_rect.max.y - _rect.min.y));
