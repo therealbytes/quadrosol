@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-// TODO: Import from mud
 import {Set as MudSet} from "solecs/Set.sol";
 
 contract Set is MudSet {
