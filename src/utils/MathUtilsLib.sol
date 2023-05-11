@@ -2,27 +2,27 @@
 pragma solidity >=0.8.0;
 
 library MathUtilsLib {
-    function max(uint256 a, uint256 b) public pure returns (uint256) {
+    function max(uint256 a, uint256 b) internal pure returns (uint256) {
         return a > b ? a : b;
     }
 
-    function min(uint256 a, uint256 b) public pure returns (uint256) {
+    function min(uint256 a, uint256 b) internal pure returns (uint256) {
         return a < b ? a : b;
     }
 
-    function max(int256 a, int256 b) public pure returns (int256) {
+    function max(int256 a, int256 b) internal pure returns (int256) {
         return a > b ? a : b;
     }
 
-    function min(int256 a, int256 b) public pure returns (int256) {
+    function min(int256 a, int256 b) internal pure returns (int256) {
         return a < b ? a : b;
     }
 
-    function maxInt32(int32 a, int32 b) public pure returns (int32) {
+    function maxInt32(int32 a, int32 b) internal pure returns (int32) {
         return a > b ? a : b;
     }
 
-    function minInt32(int32 a, int32 b) public pure returns (int32) {
+    function minInt32(int32 a, int32 b) internal pure returns (int32) {
         return a < b ? a : b;
     }
 }

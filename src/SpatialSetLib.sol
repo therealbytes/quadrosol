@@ -25,7 +25,7 @@ library SpatialSetQueriesLib {
     function has(
         ISetRead set,
         Point memory point
-    ) public view returns (bool) {
+    ) internal view returns (bool) {
         return set.has(point.encode());
     }
 
@@ -33,7 +33,7 @@ library SpatialSetQueriesLib {
         ISetRead set,
         Rect memory setRect,
         Rect memory rect
-    ) public view returns (Point[] memory) {
+    ) internal view returns (Point[] memory) {
         Point[] memory points;
 
         if (!setRect.intersects(rect)) {
@@ -114,7 +114,7 @@ library SpatialSetQueriesLib {
         ISetRead set,
         Point memory point,
         uint256 maxDistance
-    ) public view returns (Point memory, bool) {
+    ) internal view returns (Point memory, bool) {
         if (has(set, point)) {
             return (point, true);
         }
@@ -143,7 +143,7 @@ library SpatialSetQueriesLib {
     function nearest(
         ISet set,
         Point memory point
-    ) public view returns (Point memory, bool) {
+    ) internal view returns (Point memory, bool) {
         return nearest(set, point, 2 ** 32 - 1);
     }
 
@@ -166,20 +166,20 @@ library SpatialSetLib {
     using PointLib for Point;
     using RectLib for Rect;
 
-    function init(SpatialSet storage ss, Rect memory rect) public {
+    function init(SpatialSet storage ss, Rect memory rect) internal {
         require(address(ss.set) == address(0), "Already initialized");
         ss.set = ISet(address(new Set()));
         ss.rect = rect;
     }
 
-    function size(SpatialSet storage ss) public view returns (uint256) {
+    function size(SpatialSet storage ss) internal view returns (uint256) {
         return ss.set.size();
     }
 
     function add(
         SpatialSet storage ss,
         Point memory point
-    ) public returns (bool) {
+    ) internal returns (bool) {
         if (!ss.rect.contains(point)) {
             return false;
         }
@@ -194,7 +194,7 @@ library SpatialSetLib {
     function remove(
         SpatialSet storage ss,
         Point memory point
-    ) public returns (bool) {
+    ) internal returns (bool) {
         uint256 data = point.encode();
         if (!ss.set.has(data)) {
             return false;
@@ -206,21 +206,21 @@ library SpatialSetLib {
     function has(
         SpatialSet storage ss,
         Point memory point
-    ) public view returns (bool) {
+    ) internal view returns (bool) {
         return SpatialSetQueriesLib.has(ss.set, point);
     }
 
     function searchRect(
         SpatialSet storage ss,
         Rect memory rect
-    ) public view returns (Point[] memory) {
+    ) internal view returns (Point[] memory) {
         return SpatialSetQueriesLib.searchRect(ss.set, ss.rect, rect);
     }
 
     function nearest(
         SpatialSet storage ss,
         Point memory point
-    ) public view returns (Point memory, bool) {
+    ) internal view returns (Point memory, bool) {
         return SpatialSetQueriesLib.nearest(ss.set, point);
     }
 
@@ -228,7 +228,7 @@ library SpatialSetLib {
         SpatialSet storage ss,
         Point memory point,
         uint256 maxDistance
-    ) public view returns (Point memory, bool) {
+    ) internal view returns (Point memory, bool) {
         return SpatialSetQueriesLib.nearest(ss.set, point, maxDistance);
     }
 }

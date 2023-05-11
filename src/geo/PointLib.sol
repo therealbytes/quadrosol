@@ -4,14 +4,14 @@ pragma solidity >=0.8.0;
 import {Point} from "./Point.sol";
 
 library PointLib {
-    function eq(Point memory a, Point memory b) public pure returns (bool) {
+    function eq(Point memory a, Point memory b) internal pure returns (bool) {
         return a.x == b.x && a.y == b.y;
     }
 
     function distanceSq(
         Point memory a,
         Point memory b
-    ) public pure returns (uint256) {
+    ) internal pure returns (uint256) {
         return
             uint256(
                 int256((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y))

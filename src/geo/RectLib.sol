@@ -15,14 +15,14 @@ enum Quadrant {
 library RectLib {
     using PointLib for Point;
 
-    function eq(Rect memory a, Rect memory b) public pure returns (bool) {
+    function eq(Rect memory a, Rect memory b) internal pure returns (bool) {
         return PointLib.eq(a.min, b.min) && PointLib.eq(a.max, b.max);
     }
 
     function contains(
         Rect memory rect,
         Point memory point
-    ) public pure returns (bool) {
+    ) internal pure returns (bool) {
         return
             rect.min.x <= point.x &&
             point.x < rect.max.x &&
@@ -30,7 +30,7 @@ library RectLib {
             point.y < rect.max.y;
     }
 
-    function area(Rect memory rect) public pure returns (uint256) {
+    function area(Rect memory rect) internal pure returns (uint256) {
         return
             uint256(int256(rect.max.x - rect.min.x)) *
             uint256(int256(rect.max.y - rect.min.y));
@@ -39,7 +39,7 @@ library RectLib {
     function intersects(
         Rect memory rect,
         Rect memory other
-    ) public pure returns (bool) {
+    ) internal pure returns (bool) {
         return
             rect.min.x < other.max.x &&
             other.min.x < rect.max.x &&
@@ -50,7 +50,7 @@ library RectLib {
     function overlap(
         Rect memory rect,
         Rect memory other
-    ) public pure returns (Rect memory) {
+    ) internal pure returns (Rect memory) {
         Rect memory overlapRect = Rect({
             min: Point({
                 x: MathUtilsLib.maxInt32(rect.min.x, other.min.x),
@@ -73,7 +73,7 @@ library RectLib {
     function distanceSq(
         Rect memory rect,
         Point memory point
-    ) public pure returns (uint256) {
+    ) internal pure returns (uint256) {
         int32 xd = MathUtilsLib.maxInt32(
             rect.min.x - point.x,
             point.x - rect.max.x
@@ -88,7 +88,7 @@ library RectLib {
     function quadrant(
         Rect memory rect,
         Quadrant quad
-    ) public pure returns (Rect memory) {
+    ) internal pure returns (Rect memory) {
         int32 midX = (rect.min.x + rect.max.x) / 2;
         int32 midY = (rect.min.y + rect.max.y) / 2;
         if (quad == Quadrant.TOP_LEFT) {
@@ -114,7 +114,7 @@ library RectLib {
     function whichQuadrant(
         Rect memory rect,
         Point memory point
-    ) public pure returns (Quadrant) {
+    ) internal pure returns (Quadrant) {
         int32 midX = (rect.min.x + rect.max.x) / 2;
         int32 midY = (rect.min.y + rect.max.y) / 2;
         if (point.y < midY) {

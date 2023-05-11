@@ -26,7 +26,7 @@ library NodeLib {
     // Wether to expand point arrays when they are full and there are
     bool internal constant EXPAND_ARRAYS = true;
 
-    function isLeaf(Node storage node) public view returns (bool) {
+    function isLeaf(Node storage node) internal view returns (bool) {
         return !node.isInternal;
     }
 
@@ -34,7 +34,7 @@ library NodeLib {
         Node storage node,
         Rect memory rect,
         Point memory point
-    ) public returns (bool) {
+    ) internal returns (bool) {
         if (isLeaf(node)) {
             for (uint256 i = 0; i < node.points.length; i++) {
                 if (
@@ -54,7 +54,7 @@ library NodeLib {
         }
     }
 
-    function subdivide(Node storage node, Rect memory rect) public {
+    function subdivide(Node storage node, Rect memory rect) internal {
         node.isInternal = true;
         for (uint256 i = 0; i < node.points.length; i++) {
             add(node, rect, node.points[i]);
@@ -66,7 +66,7 @@ library NodeLib {
         Node storage node,
         Rect memory rect,
         Point memory point
-    ) public returns (bool) {
+    ) internal returns (bool) {
         if (isLeaf(node)) {
             for (uint256 i = 0; i < node.points.length; i++) {
                 if (
@@ -89,7 +89,7 @@ library NodeLib {
         Node storage node,
         Rect memory rect,
         Point memory point
-    ) public view returns (bool) {
+    ) internal view returns (bool) {
         if (isLeaf(node)) {
             for (uint256 i = 0; i < node.points.length; i++) {
                 if (
@@ -111,7 +111,7 @@ library NodeLib {
         Rect memory queryRect,
         Point[] memory points,
         uint256 count
-    ) public view returns (uint256, Point[] memory) {
+    ) internal view returns (uint256, Point[] memory) {
         // Points is returned as it may be expanded
         if (isLeaf(node)) {
             for (uint256 i = 0; i < node.points.length; i++) {
@@ -156,7 +156,7 @@ library NodeLib {
         Point memory nearestPoint,
         uint256 minDistanceSq,
         bool haveNearest
-    ) public view returns (Point memory, uint256, bool) {
+    ) internal view returns (Point memory, uint256, bool) {
         if (isLeaf(node)) {
             for (uint256 i = 0; i < node.points.length; i++) {
                 uint256 d = point.distanceSq(node.points[i]);
@@ -219,19 +219,19 @@ library QuadTreeLib {
     // this ratio divided by 10.
     uint256 internal constant SIZE_GUESS_RATIO_T10 = 15;
 
-    function init(QuadTree storage qt, Rect memory rect) public {
+    function init(QuadTree storage qt, Rect memory rect) internal {
         require(qt._size == 0, "Not empty");
         qt.rect = rect;
     }
 
-    function size(QuadTree storage qt) public view returns (uint256) {
+    function size(QuadTree storage qt) internal view returns (uint256) {
         return qt._size;
     }
 
     function add(
         QuadTree storage qt,
         Point memory point
-    ) public returns (bool) {
+    ) internal returns (bool) {
         if (!qt.rect.contains(point)) {
             return false;
         }
@@ -245,7 +245,7 @@ library QuadTreeLib {
     function remove(
         QuadTree storage qt,
         Point memory point
-    ) public returns (bool) {
+    ) internal returns (bool) {
         if (!qt.rect.contains(point)) {
             return false;
         }
@@ -259,7 +259,7 @@ library QuadTreeLib {
     function has(
         QuadTree storage qt,
         Point memory point
-    ) public view returns (bool) {
+    ) internal view returns (bool) {
         if (!qt.rect.contains(point)) {
             return false;
         }
@@ -269,7 +269,7 @@ library QuadTreeLib {
     function searchRect(
         QuadTree storage qt,
         Rect memory rect
-    ) public view returns (Point[] memory) {
+    ) internal view returns (Point[] memory) {
         Point[] memory points;
         if (!qt.rect.intersects(rect)) {
             return points;
@@ -325,7 +325,7 @@ library QuadTreeLib {
         QuadTree storage qt,
         Point memory point,
         uint256 maxDistanceSq
-    ) public view returns (Point memory, bool) {
+    ) internal view returns (Point memory, bool) {
         (Point memory nearestPoint, , bool haveNearest) = qt
             .root
             .nearest(qt.rect, point, Point(0, 0), maxDistanceSq, false);
@@ -335,7 +335,7 @@ library QuadTreeLib {
     function nearest(
         QuadTree storage qt,
         Point memory point
-    ) public view returns (Point memory, bool) {
+    ) internal view returns (Point memory, bool) {
         return nearest(qt, point, 2 ** 32 - 1);
     }
 }

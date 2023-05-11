@@ -3,12 +3,14 @@ pragma solidity >=0.8.0;
 
 import "forge-std/Test.sol";
 
-import {Point, Rect} from "../src/geo/Index.sol";
+import {Point, Rect, RectLib} from "../src/geo/Index.sol";
 import {IIndex} from "../src/interfaces/IIndex.sol";
 import {QuadTreeObj} from "../src/QuadTreeLib.sol";
 import {SpatialSetObj} from "../src/SpatialSetLib.sol";
 
 abstract contract ObjBench is Test {
+    using RectLib for Rect;
+
     bytes32 internal rnd;
     uint256 internal gu;
 
@@ -73,7 +75,7 @@ abstract contract ObjBench is Test {
     // TODO: benchHasNo
 
     function benchSearchRect(uint256 pm, uint256 query) internal virtual {
-        uint256 units = (area(rect) * pm) / 1000;
+        uint256 units = (rect.area() * pm) / 1000;
         addMany(units);
         Rect memory queryRect = Rect(Point(0, 0), pointInDiagonal(query));
         startGasMetering();
@@ -84,7 +86,7 @@ abstract contract ObjBench is Test {
     }
 
     function benchNearest(uint256 pm) internal virtual {
-        uint256 units = (area(rect) * pm) / 1000;
+        uint256 units = (rect.area() * pm) / 1000;
         addMany(units);
         Point[] memory points = newRandomPoints(RUNS);
         startGasMetering();
@@ -222,13 +224,6 @@ abstract contract ObjBench is Test {
         for (uint256 i = 0; i < points.length; i++) {
             obj.add(points[i]);
         }
-    }
-
-    // For some reason, importing RectLib makes forge not find the tests
-    function area(Rect memory _rect) public pure virtual returns (uint256) {
-        return
-            uint256(int256(_rect.max.x - _rect.min.x)) *
-            uint256(int256(_rect.max.y - _rect.min.y));
     }
 }
 
