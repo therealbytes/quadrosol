@@ -7,9 +7,8 @@ interface IIndexRead {
     // Returns the number of points in the index.
     function size() external view returns (uint256);
 
-    // TODO: Consider renaming to has
-    // Returns true if the index contains the point.
-    function contains(Point memory point) external view returns (bool);
+    // Returns true if the index has the point.
+    function has(Point memory point) external view returns (bool);
 
     // Returns all points in the index within the given rectangle.
     function searchRect(
@@ -23,10 +22,9 @@ interface IIndexRead {
 }
 
 interface IIndexWrite {
-    // TODO: Consider renaming to add
-    // Inserts a point into the index. Returns false if the point was already in the index
+    // Adds a point into the index. Returns false if the point was already in the index
     // and true otherwise.
-    function insert(Point memory point) external returns (bool);
+    function add(Point memory point) external returns (bool);
 
     // Removes a point from the index. Returns false if the point was not in the index
     // and true otherwise.

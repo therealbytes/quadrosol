@@ -22,7 +22,7 @@ library SpatialSetQueriesLib {
     bool internal constant USE_SIZE_GUESSES = false;
     uint256 internal constant SIZE_GUESS_RATIO_T10 = 15;
 
-    function contains(
+    function has(
         ISetRead set,
         Point memory point
     ) public view returns (bool) {
@@ -73,7 +73,7 @@ library SpatialSetQueriesLib {
             if (49 * setSize < 37 * searchArea) {
                 // Check every point in the set
                 for (uint256 i = 0; i < setSize; i++) {
-                    (bool ok, uint256 data) = set.getItem(i);
+                    (, uint256 data) = set.getItem(i);
                     Point memory point;
                     point.decode(data);
                     if (rect.contains(point)) {
@@ -115,7 +115,7 @@ library SpatialSetQueriesLib {
         Point memory point,
         uint256 maxDistance
     ) public view returns (Point memory, bool) {
-        if (contains(set, point)) {
+        if (has(set, point)) {
             return (point, true);
         }
 
@@ -124,7 +124,7 @@ library SpatialSetQueriesLib {
         bool haveNearest;
         // Check every point in the set
         for (uint256 i = 0; i < set.size(); i++) {
-            (bool ok, uint256 data) = set.getItem(i);
+            (, uint256 data) = set.getItem(i);
             Point memory p;
             p.decode(data);
             uint256 distanceSq = point.distanceSq(p);
@@ -176,7 +176,7 @@ library SpatialSetLib {
         return ss.set.size();
     }
 
-    function insert(
+    function add(
         SpatialSet storage ss,
         Point memory point
     ) public returns (bool) {
@@ -203,11 +203,11 @@ library SpatialSetLib {
         return true;
     }
 
-    function contains(
+    function has(
         SpatialSet storage ss,
         Point memory point
     ) public view returns (bool) {
-        return SpatialSetQueriesLib.contains(ss.set, point);
+        return SpatialSetQueriesLib.has(ss.set, point);
     }
 
     function searchRect(
@@ -246,16 +246,16 @@ contract SpatialSetObj is IIndex {
         return set.size();
     }
 
-    function insert(Point memory point) external returns (bool) {
-        return set.insert(point);
+    function add(Point memory point) external returns (bool) {
+        return set.add(point);
     }
 
     function remove(Point memory point) external returns (bool) {
         return set.remove(point);
     }
 
-    function contains(Point memory point) external view returns (bool) {
-        return set.contains(point);
+    function has(Point memory point) external view returns (bool) {
+        return set.has(point);
     }
 
     function searchRect(

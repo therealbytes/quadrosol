@@ -29,25 +29,25 @@ abstract contract ObjBench is Test {
 
     function reset() internal virtual;
 
-    function benchInsert(uint256 units) internal virtual {
-        insertMany(units);
+    function benchAdd(uint256 units) internal virtual {
+        addMany(units);
         uint256 startingSize = obj.size();
         Point[] memory points = newRandomPoints(RUNS);
         startGasMetering();
-        insertPoints(points);
+        addPoints(points);
         uint256 gas = endGasMetering() / RUNS;
-        console.log("Insert-%d: %d", units, gas);
+        console.log("Add-%d: %d", units, gas);
         assertEq(obj.size(), startingSize + RUNS);
     }
 
     function benchRemove(uint256 units) internal virtual {
-        insertMany(units);
+        addMany(units);
         uint256 runs = RUNS;
         if (units < runs) {
             runs = units;
         }
         Point[] memory points = newRandomPoints(runs);
-        insertPoints(points);
+        addPoints(points);
         uint256 startingSize = obj.size();
         startGasMetering();
         for (uint256 i = 0; i < runs; i++) {
@@ -58,23 +58,23 @@ abstract contract ObjBench is Test {
         assertEq(obj.size(), startingSize - runs);
     }
 
-    function benchContainsYes(uint256 units) internal virtual {
-        insertMany(units);
+    function benchHasYes(uint256 units) internal virtual {
+        addMany(units);
         Point[] memory points = newRandomPoints(RUNS);
-        insertPoints(points);
+        addPoints(points);
         startGasMetering();
         for (uint256 i = 0; i < RUNS; i++) {
-            obj.contains(points[i]);
+            obj.has(points[i]);
         }
         uint256 gas = endGasMetering() / RUNS;
-        console.log("Contains-%d: %d", units, gas);
+        console.log("Has-%d: %d", units, gas);
     }
 
-    // TODO: benchContainsNo
+    // TODO: benchHasNo
 
     function benchSearchRect(uint256 pm, uint256 query) internal virtual {
         uint256 units = (area(rect) * pm) / 1000;
-        insertMany(units);
+        addMany(units);
         Rect memory queryRect = Rect(Point(0, 0), pointInDiagonal(query));
         startGasMetering();
         obj.searchRect(queryRect);
@@ -85,7 +85,7 @@ abstract contract ObjBench is Test {
 
     function benchNearest(uint256 pm) internal virtual {
         uint256 units = (area(rect) * pm) / 1000;
-        insertMany(units);
+        addMany(units);
         Point[] memory points = newRandomPoints(RUNS);
         startGasMetering();
         for (uint256 i = 0; i < RUNS; i++) {
@@ -95,10 +95,10 @@ abstract contract ObjBench is Test {
         console.log("Nearest-%d: %d", pm, gas);
     }
 
-    function testBenchInsert() public virtual {
-        console.log("%s: Insert", name);
+    function testBenchAdd() public virtual {
+        console.log("%s: Add", name);
         for (uint256 i = 0; i < 4; i++) {
-            benchInsert(10**i);
+            benchAdd(10**i);
             reset();
         }
     }
@@ -111,10 +111,10 @@ abstract contract ObjBench is Test {
         }
     }
 
-    function testBenchContains() public virtual {
-        console.log("%s: Contains", name);
+    function testBenchHas() public virtual {
+        console.log("%s: Has", name);
         for (uint256 i = 0; i < 4; i++) {
-            benchContainsYes(10**i);
+            benchHasYes(10**i);
             reset();
         }
     }
@@ -198,7 +198,7 @@ abstract contract ObjBench is Test {
         Point memory point;
         do {
             point = randomPoint();
-        } while (obj.contains(point));
+        } while (obj.has(point));
         return point;
     }
 
@@ -210,17 +210,17 @@ abstract contract ObjBench is Test {
         return points;
     }
 
-    function insertMany(uint256 units) internal virtual {
+    function addMany(uint256 units) internal virtual {
         for (uint256 i = 0; i < units; i++) {
             Point memory point = randomPoint();
             // Point memory point = newRandomPoint();
-            obj.insert(point);
+            obj.add(point);
         }
     }
 
-    function insertPoints(Point[] memory points) internal virtual {
+    function addPoints(Point[] memory points) internal virtual {
         for (uint256 i = 0; i < points.length; i++) {
-            obj.insert(points[i]);
+            obj.add(points[i]);
         }
     }
 

@@ -30,7 +30,7 @@ library NodeLib {
         return !node.isInternal;
     }
 
-    function insert(
+    function add(
         Node storage node,
         Rect memory rect,
         Point memory point
@@ -50,14 +50,14 @@ library NodeLib {
             return true;
         } else {
             Quadrant q = rect.whichQuadrant(point);
-            return insert(node.children[q], rect.quadrant(q), point);
+            return add(node.children[q], rect.quadrant(q), point);
         }
     }
 
     function subdivide(Node storage node, Rect memory rect) public {
         node.isInternal = true;
         for (uint256 i = 0; i < node.points.length; i++) {
-            insert(node, rect, node.points[i]);
+            add(node, rect, node.points[i]);
         }
         delete node.points;
     }
@@ -85,7 +85,7 @@ library NodeLib {
         }
     }
 
-    function contains(
+    function has(
         Node storage node,
         Rect memory rect,
         Point memory point
@@ -101,7 +101,7 @@ library NodeLib {
             return false;
         } else {
             Quadrant q = rect.whichQuadrant(point);
-            return contains(node.children[q], rect.quadrant(q), point);
+            return has(node.children[q], rect.quadrant(q), point);
         }
     }
 
@@ -228,14 +228,14 @@ library QuadTreeLib {
         return qt._size;
     }
 
-    function insert(
+    function add(
         QuadTree storage qt,
         Point memory point
     ) public returns (bool) {
         if (!qt.rect.contains(point)) {
             return false;
         }
-        if (qt.root.insert(qt.rect, point)) {
+        if (qt.root.add(qt.rect, point)) {
             qt._size++;
             return true;
         }
@@ -256,14 +256,14 @@ library QuadTreeLib {
         return false;
     }
 
-    function contains(
+    function has(
         QuadTree storage qt,
         Point memory point
     ) public view returns (bool) {
         if (!qt.rect.contains(point)) {
             return false;
         }
-        return qt.root.contains(qt.rect, point);
+        return qt.root.has(qt.rect, point);
     }
 
     function searchRect(
@@ -326,7 +326,7 @@ library QuadTreeLib {
         Point memory point,
         uint256 maxDistanceSq
     ) public view returns (Point memory, bool) {
-        (Point memory nearestPoint, uint256 distanceSq, bool haveNearest) = qt
+        (Point memory nearestPoint, , bool haveNearest) = qt
             .root
             .nearest(qt.rect, point, Point(0, 0), maxDistanceSq, false);
         return (nearestPoint, haveNearest);
@@ -353,16 +353,16 @@ contract QuadTreeObj is IIndex {
         return tree.size();
     }
 
-    function insert(Point memory point) external returns (bool) {
-        return tree.insert(point);
+    function add(Point memory point) external returns (bool) {
+        return tree.add(point);
     }
 
     function remove(Point memory point) external returns (bool) {
         return tree.remove(point);
     }
 
-    function contains(Point memory point) external view returns (bool) {
-        return tree.contains(point);
+    function has(Point memory point) external view returns (bool) {
+        return tree.has(point);
     }
 
     function searchRect(

@@ -16,26 +16,26 @@ abstract contract ObjTest is Test {
         rect = Rect(Point(-10, -10), Point(10, 10));
     }
 
-    function testInsert() public virtual {
+    function testAdd() public virtual {
         Point memory point = Point(0, 0);
-        assertTrue(obj.insert(point));
-        assertFalse(obj.insert(point));
+        assertTrue(obj.add(point));
+        assertFalse(obj.add(point));
         assertTrue(obj.size() == 1);
     }
 
     function testRemove() public virtual {
         Point memory point = Point(0, 0);
-        assertTrue(obj.insert(point));
+        assertTrue(obj.add(point));
         assertTrue(obj.remove(point));
         assertFalse(obj.remove(point));
         assertTrue(obj.size() == 0);
     }
 
-    function testContains() public virtual {
+    function testHas() public virtual {
         Point memory point = Point(0, 0);
-        assertFalse(obj.contains(point));
-        assertTrue(obj.insert(point));
-        assertTrue(obj.contains(point));
+        assertFalse(obj.has(point));
+        assertTrue(obj.add(point));
+        assertTrue(obj.has(point));
     }
 
     function testSearchRect() public virtual {
@@ -43,10 +43,10 @@ abstract contract ObjTest is Test {
         Point memory pIn1 = Point(1, 1);
         Point memory pOut0 = Point(5, 5);
         Point memory pOut1 = Point(-5, -5);
-        assertTrue(obj.insert(pIn0));
-        assertTrue(obj.insert(pIn1));
-        assertTrue(obj.insert(pOut0));
-        assertTrue(obj.insert(pOut1));
+        assertTrue(obj.add(pIn0));
+        assertTrue(obj.add(pIn1));
+        assertTrue(obj.add(pOut0));
+        assertTrue(obj.add(pOut1));
         Point[] memory points = obj.searchRect(
             Rect(Point(-1, -1), Point(2, 2))
         );
@@ -61,10 +61,10 @@ abstract contract ObjTest is Test {
         Point memory p1 = Point(1, 1);
         Point memory p2 = Point(5, 5);
         Point memory p3 = Point(-5, -5);
-        assertTrue(obj.insert(p0));
-        assertTrue(obj.insert(p1));
-        assertTrue(obj.insert(p2));
-        assertTrue(obj.insert(p3));
+        assertTrue(obj.add(p0));
+        assertTrue(obj.add(p1));
+        assertTrue(obj.add(p2));
+        assertTrue(obj.add(p3));
         (Point memory point, bool ok) = obj.nearest(Point(6, 6));
         assertTrue(ok);
         assertTrue(pointEq(point, p2));
