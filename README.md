@@ -22,7 +22,7 @@ contract MyContract {
     }
 
     function addPoint(Point memory point) public {
-        quadtree.insert(point);
+        quadtree.add(point);
     }
 
     function getNearestPoint(Point memory point) public view returns (Point memory, bool) {
