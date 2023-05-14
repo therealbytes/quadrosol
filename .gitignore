@@ -2,3 +2,6 @@ cache
 out
 node_modules
 yarn-error.log
+build/bin/geth
+engine/bin/*.wasm
+.netrc
