@@ -1,6 +1,7 @@
 {
   "solidity.remappings": [
     "solecs/=./node_modules/@latticexyz/solecs/src/",
-    "forge-std/=./node_modules/forge-std/"
+    "forge-std/=./node_modules/forge-std/",
+    "pclib/=./node_modules/pclib/src"
   ]
 }
