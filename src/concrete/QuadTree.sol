@@ -5,6 +5,10 @@ import {MemLib} from "pclib/MemLib.sol";
 import {Caller} from "pclib/Caller.sol";
 import {Rect, Point} from "../geo/Index.sol";
 
+struct QuadTree {
+    uint256 id;
+}
+
 enum OpQuadDB {
     Create,
     Delete,
@@ -160,10 +164,6 @@ library QuadDBLib {
         (rect.max, r) = refPoint(r);
         return (rect, r);
     }
-}
-
-struct QuadTree {
-    uint256 id;
 }
 
 library QuadTreeLib {
