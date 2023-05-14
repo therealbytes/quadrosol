@@ -5,8 +5,8 @@ import "forge-std/Test.sol";
 
 import {Point, Rect} from "../src/geo/Index.sol";
 import {IIndex} from "../src/interfaces/IIndex.sol";
-import {QuadTreeObj} from "../src/QuadTreeLib.sol";
-import {SpatialSetObj} from "../src/SpatialSetLib.sol";
+import {QuadTreeObj} from "../src/QuadTree.sol";
+import {SpatialSetObj} from "../src/SpatialSet.sol";
 
 abstract contract ObjTest is Test {
     IIndex internal obj;
