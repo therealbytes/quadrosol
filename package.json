@@ -23,7 +23,7 @@
     "@latticexyz/solecs": "^1.33.1",
     "@solidstate/contracts": "^0.0.52",
     "ds-test": "https://github.com/dapphub/ds-test.git#c7a36fb236f298e04edf28e2fee385b80f53945f",
-    "forge-std": "^1.1.2",
+    "forge-std": "https://github.com/foundry-rs/forge-std.git#b4f121555729b3afb3c5ffccb62ff4b6e2818fd3",
     "pclib": "ssh://git@github.com/therealbytes/pclib#2f1b21b3130858ce7b0deb00d4dc50ad28c82061",
     "prettier": "^2.6.2",
     "prettier-plugin-solidity": "^1.0.0-beta.19",
