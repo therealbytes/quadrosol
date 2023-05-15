@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import {QuadTreeLib, QuadTree} from "./QuadTreeLib.sol";
+import {QuadTreeLib, QuadTree} from "./QuadTree.sol";
 import {Rect, Point, PointLib} from "../geo/Index.sol";
 
 contract LiveTest {
