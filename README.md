@@ -1,39 +1,52 @@
+For the Concrete app-chain implementation, see the [Concrete](tree/concrete) branch.
+
+-------
+
 # Quadrosol
 
-Quadrosol is a quadtree implementation in Solidity that enables efficient spatial queries on a set of points in 2D space.
+Quadrosol is a Solidity implementation of a quadtree that allows for fast spatial queries on a collection of points within a two-dimensional space.
 
 ## Installation
 
 `forge install https://github.com/therealbytes/quadrosol`
+
+`npm install https://github.com/therealbytes/quadrosol`
+
+`yarn add https://github.com/therealbytes/quadrosol`
 
 ## Usage
 
 ```solidity
 pragma solidity ^0.8.0;
 
-import { QuadTree, QuadTreeLib, Point, Rect } "lib/quadrosol/src/QuadTree.sol";
+import {QuadTree, QuadTreeLib, Point, Rect} from "quadrosol/QuadTree.sol";
 
 contract MyContract {
     using QuadTreeLib for QuadTree;
-    QuadTree quadtree;
+    QuadTree internal tree;
 
     constructor() {
-        quadtree.init(Rect(Point(0, 0), Point(100, 100)));
+        Point memory topLeft = Point(0, 0);
+        Point memory bottomRight = Point(100, 100);
+        Rect memory rect = Rect(topLeft, bottomRight);
+        tree.init(rect);
     }
 
     function addPoint(Point memory point) public {
-        quadtree.add(point);
+        tree.add(point);
     }
 
-    function getNearestPoint(Point memory point) public view returns (Point memory, bool) {
-        return quadtree.nearest(point);
+    function getNearestPoint(
+        Point memory point
+    ) public view returns (Point memory, bool) {
+        return tree.nearest(point);
     }
 }
 ```
 
 ## Interface
 
-See [IIndex.sol](src/IIndex.sol) for the full interface.
+See [IIndex.sol](src/interfaces/IIndex.sol) for the interface.
 
 ## Development
 
@@ -51,6 +64,5 @@ yarn benchmark
 
 - Rigorous testing
 - Generalize `nearest` query to `nearestK`
-- Add alternative distance functions e.g. manhattan
-- Add `searchCircle`
+- Add `searchCircle` query
 - Add `replace` method
