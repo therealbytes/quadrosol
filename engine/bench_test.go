@@ -15,6 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/concrete/wasm"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/ethdb/memorydb"
 )
 
 var implementations = []struct {
@@ -78,11 +79,14 @@ func BenchmarkQuadTreeAdd(b *testing.B) {
 		b.Run(impl.name, func(b *testing.B) {
 			for _, size := range treeSizes {
 				b.Run(fmt.Sprintf("TreeSize_%d", size), func(b *testing.B) {
-					db := state.NewDatabase(rawdb.NewMemoryDatabase())
+					memdb := memorydb.New()
+					db := state.NewDatabase(rawdb.NewDatabase(memdb))
 					state0, _ := state.New(common.Hash{}, db, nil)
 					api0 := pcs_test.NewTestAPIWithStateDB(state0, address)
 					state0.SetBalance(address, common.Big1)
 
+					// Set up tree and record memdb length increase
+					dbStartLen := memdb.Len()
 					id, err := wpc.Create(api0, quadtree.NewRect(-halfSide, -halfSide, 2*halfSide, 2*halfSide))
 					if err != nil {
 						b.Fatal(err)
@@ -93,32 +97,46 @@ func BenchmarkQuadTreeAdd(b *testing.B) {
 							b.Fatal(err)
 						}
 					}
-
 					state0Root, err := state0.Commit(true)
 					if err != nil {
 						b.Fatal(err)
 					}
+					dbDeltaPreimages := memdb.Len() - dbStartLen
+					err = state0.Database().TrieDB().Commit(state0Root, false)
+					if err != nil {
+						b.Fatal(err)
+					}
+					dbDeltaTrieNodes := memdb.Len() - dbStartLen - dbDeltaPreimages
 
+					// Run benchmark
 					b.ResetTimer()
 					elapsedTime := time.Duration(0)
 					oks := 0
 					for i := 0; i < b.N; i++ {
+						// Reset state
 						state1, _ := state.New(state0Root, db, nil)
 						api1 := pcs_test.NewTestAPIWithStateDB(state1, address)
 						point := randomPoint(-halfSide, halfSide)
+						// ==== Start timer ====
 						startTime := time.Now()
+						// Add point
 						ok, err := wpc.Add(api1, id, point)
-						elapsedTime += time.Since(startTime)
 						if err != nil {
 							b.Fatal(err)
 						}
+						elapsedTime += time.Since(startTime)
+						// ====  Stop timer  ====
 						if ok {
 							oks++
 						}
 					}
 					b.StopTimer()
-					b.ReportMetric(float64(elapsedTime.Microseconds())/float64(b.N), "adj-µs/op")
+					b.ReportMetric(float64(elapsedTime.Nanoseconds())/float64(b.N), "ns/op")
 					// b.ReportMetric(float64(oks)/float64(b.N), "ok")
+					if size > 0 {
+						b.ReportMetric(float64(dbDeltaPreimages), "pi-entries")
+						b.ReportMetric(float64(dbDeltaTrieNodes), "trie-entries")
+					}
 				})
 			}
 		})
