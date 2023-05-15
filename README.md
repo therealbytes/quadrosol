@@ -2,7 +2,7 @@
 
 Quadrosol is a Solidity implementation of a quadtree that allows for fast spatial queries on a collection of points within a two-dimensional space.
 
-*For the Concrete app-chain implementation, see the [Concrete](https://github.com/therealbytes/quadrosol/tree/concrete) branch.*
+*For the Concrete app-chain implementation, see the* [`concrete`](https://github.com/therealbytes/quadrosol/tree/concrete) *branch.*
 
 ## Installation
 
