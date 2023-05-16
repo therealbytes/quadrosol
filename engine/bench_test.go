@@ -97,7 +97,7 @@ func randomPoint(min int, max int) quadtree.Point {
 func BenchmarkQuadTreeAdd(b *testing.B) {
 	rand.Seed(1)
 	halfSide := 5_000
-	treeSizes := []int{0, 100, 1000}
+	treeSizes := []int{0, 100, 1000, 10000}
 	for _, impl := range implementations {
 		quaddb := impl.db
 		address := impl.addr
