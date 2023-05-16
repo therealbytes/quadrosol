@@ -54,6 +54,16 @@ func (db *quadCoreDB) Put(qt *quadtree.QuadTreeCore) (common.Hash, error) {
 	return hash, nil
 }
 
+func (db *quadCoreDB) getEphemeral(key common.Hash) (*quadtree.QuadTreeCore, bool) {
+	blob := db.StateDB().GetEphemeralPreimage(key)
+	if len(blob) == 0 {
+		return nil, false
+	}
+	core := &quadtree.QuadTreeCore{}
+	core.Decode(blob)
+	return core, true
+}
+
 var (
 	RootCounterID    = tg_lib.Keccak256Hash([]byte("quad.RootCounter.v0"))
 	RootMapID        = tg_lib.Keccak256Hash([]byte("quad.RootMap.v0"))
@@ -216,7 +226,7 @@ func (pc *ReadQuadTree) Run(api cc_api.API, input []byte) ([]byte, error) {
 
 type AddToQuadTree struct {
 	lib.BlankPrecompile
-	committedRoots map[common.Hash]struct{}
+	committedHashes map[common.Hash]struct{}
 }
 
 func (pc *AddToQuadTree) MutatesStorage(input []byte) bool {
@@ -227,22 +237,28 @@ func (pc *AddToQuadTree) Commit(api cc_api.API) error {
 	coredb := NewQuadCoreDB(api)
 	statedb := api.StateDB()
 	dirties := NewQuadRecordDB(api).DirtyRoots()
-	pc.committedRoots = make(map[common.Hash]struct{})
-	defer func() { pc.committedRoots = nil }()
+	pc.committedHashes = make(map[common.Hash]struct{})
 	// NOTE: Array should implement the iterable interface
 	for i := 0; i < dirties.Length(); i++ {
 		hash := dirties.Get(i)
 		pc.commitQuadTree(coredb, statedb, hash)
 	}
+	pc.committedHashes = nil
 	return nil
 }
 
 func (pc *AddToQuadTree) commitQuadTree(coredb *quadCoreDB, statedb cc_api.StateDB, hash common.Hash) {
-	if _, ok := pc.committedRoots[hash]; ok {
+	if _, ok := pc.committedHashes[hash]; ok {
 		return
 	}
-	pc.committedRoots[hash] = struct{}{}
-	core, _ := coredb.Get(hash)
+	core, ok := coredb.getEphemeral(hash)
+	if !ok {
+		return
+	}
+	if len(pc.committedHashes) < 1000 {
+		// Quick fix: tinygo behaves unexpectedly when the map is large
+		pc.committedHashes[hash] = struct{}{}
+	}
 	statedb.AddPersistentPreimage(hash, core.Encode())
 	for _, childHash := range core.QuadHashes() {
 		pc.commitQuadTree(coredb, statedb, childHash)

@@ -35,11 +35,13 @@ var implementations = []struct {
 		"Native",
 		pcs_test.QuadPCWrapper{Precompile: pcs.QuadDBPrecompile},
 		common.HexToAddress("0x1e510001"),
-	}, {
+	},
+	{
 		"WASM",
 		pcs_test.QuadPCWrapper{Precompile: wasm.NewWasmPrecompile(quaddbWasm, common.HexToAddress("0x1e510002"))},
 		common.HexToAddress("0x1e510002"),
-	}, {
+	},
+	{
 		"Solidity",
 		newQuadBytecodeWrapper("../out/QuadTree.sol/QuadTreeMap.json"),
 		common.HexToAddress("0x1e510003"),
