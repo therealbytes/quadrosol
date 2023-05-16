@@ -377,3 +377,47 @@ contract QuadTreeObj is IIndex {
         return tree.nearest(point);
     }
 }
+
+contract QuadTreeMap {
+    using QuadTreeLib for QuadTree;
+
+    mapping(uint256 => QuadTree) internal trees;
+    uint256 internal nextId;
+
+    function create(Rect memory rect) external returns (uint256) {
+        uint256 id = nextId;
+        trees[id].init(rect);
+        nextId++;
+        return id;
+    }
+
+    function size(uint256 id) external view returns (uint256) {
+        return trees[id].size();
+    }
+
+    function add(uint56 id, Point memory point) external returns (bool) {
+        return trees[id].add(point);
+    }
+
+    function remove(uint256 id, Point memory point) external returns (bool) {
+        return trees[id].remove(point);
+    }
+
+    function has(uint256 id, Point memory point) external view returns (bool) {
+        return trees[id].has(point);
+    }
+
+    function searchRect(
+        uint256 id, 
+        Rect memory rect
+    ) external view returns (Point[] memory) {
+        return trees[id].searchRect(rect);
+    }
+
+    function nearest(
+        uint256 id, 
+        Point memory point
+    ) external view returns (Point memory, bool) {
+        return trees[id].nearest(point);
+    }
+}
