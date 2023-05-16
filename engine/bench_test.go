@@ -37,7 +37,7 @@ var implementations = []struct {
 		common.HexToAddress("0x1e510001"),
 	},
 	{
-		"WASM",
+		"TinyGo-WASM",
 		pcs_test.QuadPCWrapper{Precompile: wasm.NewWasmPrecompile(quaddbWasm, common.HexToAddress("0x1e510002"))},
 		common.HexToAddress("0x1e510002"),
 	},
