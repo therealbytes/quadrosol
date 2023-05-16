@@ -346,22 +346,22 @@ func TestQuadBytecodeWrapper(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	id, err := quaddb.Create(api, quadtree.NewRect(0, 0, 100, 100))
+	id, err := quaddb.Create(api, quadtree.NewRect(0, 0, 10, 10))
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = quaddb.Add(api, id, quadtree.Point{X: 50, Y: 50})
+	_, err = quaddb.Add(api, id, quadtree.Point{X: 1, Y: 1})
 	if err != nil {
 		t.Fatal(err)
 	}
-	ok, err := quaddb.Has(api, id, quadtree.Point{X: 50, Y: 50})
+	ok, err := quaddb.Has(api, id, quadtree.Point{X: 1, Y: 1})
 	if err != nil {
 		t.Fatal(err)
 	}
 	if !ok {
 		t.Fatal("expected has() to return true")
 	}
-	ok, err = quaddb.Has(api, id, quadtree.Point{X: 51, Y: 50})
+	ok, err = quaddb.Has(api, id, quadtree.Point{X: 2, Y: 2})
 	if err != nil {
 		t.Fatal(err)
 	}
