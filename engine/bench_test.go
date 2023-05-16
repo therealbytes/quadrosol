@@ -113,7 +113,8 @@ func BenchmarkQuadTreeAdd(b *testing.B) {
 					quaddb.Init(api0, address)
 
 					// Set up tree and record memdb length increase
-					dbStartLen := memdb.Len()
+					// dbStartLen := memdb.Len()
+					dbStartLen := 0
 					id, err := quaddb.Create(api0, quadtree.NewRect(-halfSide, -halfSide, 2*halfSide, 2*halfSide))
 					if err != nil {
 						b.Fatal(err)
@@ -128,12 +129,17 @@ func BenchmarkQuadTreeAdd(b *testing.B) {
 					if err != nil {
 						b.Fatal(err)
 					}
-					dbDeltaPreimages := memdb.Len() - dbStartLen
+					dbLenBfTrieCommit := memdb.Len() - dbStartLen
 					err = state0.Database().TrieDB().Commit(state0Root, false)
 					if err != nil {
 						b.Fatal(err)
 					}
-					dbDeltaTrieNodes := memdb.Len() - dbStartLen - dbDeltaPreimages
+					dbLenAfTreeCommit := memdb.Len() - dbStartLen - dbLenBfTrieCommit
+
+					dbSize := 0
+					for it := memdb.NewIterator(nil, nil); it.Next(); {
+						dbSize += len(it.Key()) + len(it.Value())
+					}
 
 					// Run benchmark
 					b.ResetTimer()
@@ -160,8 +166,9 @@ func BenchmarkQuadTreeAdd(b *testing.B) {
 					b.StopTimer()
 					b.ReportMetric(float64(elapsedTime.Microseconds())/float64(b.N), "adj-μs/op")
 					// b.ReportMetric(float64(oks)/float64(b.N), "ok")
-					b.ReportMetric(float64(dbDeltaPreimages), "sc-len")
-					b.ReportMetric(float64(dbDeltaTrieNodes), "tc-len")
+					b.ReportMetric(float64(dbLenBfTrieCommit), "sc-len")
+					b.ReportMetric(float64(dbLenAfTreeCommit), "tc-len")
+					b.ReportMetric(float64(dbSize), "size")
 				})
 			}
 		})
