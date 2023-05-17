@@ -238,7 +238,6 @@ func (pc *AddToQuadTree) Commit(api cc_api.API) error {
 	statedb := api.StateDB()
 	dirties := NewQuadRecordDB(api).DirtyRoots()
 	pc.committedHashes = make(map[common.Hash]struct{})
-	// NOTE: Array should implement the iterable interface
 	for i := 0; i < dirties.Length(); i++ {
 		hash := dirties.Get(i)
 		pc.commitQuadTree(coredb, statedb, hash)
