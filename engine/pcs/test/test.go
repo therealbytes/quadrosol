@@ -14,8 +14,6 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 )
 
-// NOTE: Concrete should export this
-
 func NewTestAPI() cc_api.API {
 	db := state.NewDatabase(rawdb.NewMemoryDatabase())
 	statedb, _ := state.New(common.Hash{}, db, nil)
