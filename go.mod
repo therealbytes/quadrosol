@@ -1,4 +1,4 @@
-module concrete-quad
+module github.com/therealbytes/quadrosol
 
 go 1.18
 
