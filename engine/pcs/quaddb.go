@@ -157,6 +157,10 @@ func (db *quadRecordDB) DirtyRoots() cc_api.Array {
 	return db.dirties().Dirties()
 }
 
+func (db *quadRecordDB) ClearDirtyRoots() {
+	db.dirties().Clear()
+}
+
 func encodeRootMetadata(size int, rect quadtree.Rect) common.Hash {
 	data := make([]byte, 32)
 	copy(data[12:16], quadtree.Int32ToBytes(int32(size)))
@@ -237,13 +241,15 @@ func (pc *AddToQuadTree) MutatesStorage(input []byte) bool {
 func (pc *AddToQuadTree) Commit(api cc_api.API) error {
 	coredb := NewQuadCoreDB(api)
 	statedb := api.StateDB()
-	dirties := NewQuadRecordDB(api).DirtyRoots()
+	recorddb := NewQuadRecordDB(api)
+	dirties := recorddb.DirtyRoots()
 	pc.committedHashes = make(map[common.Hash]struct{})
 	for i := 0; i < dirties.Length(); i++ {
 		hash := dirties.Get(i)
 		pc.commitQuadTree(coredb, statedb, hash)
 	}
 	pc.committedHashes = nil
+	recorddb.ClearDirtyRoots()
 	return nil
 }
 

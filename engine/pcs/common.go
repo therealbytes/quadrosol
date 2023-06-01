@@ -135,6 +135,26 @@ func (t DirtiesTracker) Dec(key common.Hash) {
 	t.set(key, dirties.Sub(dirties, common.Big1))
 }
 
+func (t DirtiesTracker) Zero(key common.Hash) {
+	dirties := t.get(key)
+	if dirties.Cmp(common.Big0) == 0 {
+		return
+	}
+	t.m.Set(key, common.Hash{})
+	t.s.Remove(key)
+}
+
 func (t DirtiesTracker) Dirties() cc_api.Array {
 	return t.s.Values()
+}
+
+func (t DirtiesTracker) Clear() {
+	dirtyKeys := t.Dirties()
+	dirtyKeysCopy := make([]common.Hash, dirtyKeys.Length())
+	for i := 0; i < dirtyKeys.Length(); i++ {
+		dirtyKeysCopy[i] = dirtyKeys.Get(i)
+	}
+	for _, key := range dirtyKeysCopy {
+		t.Zero(key)
+	}
 }
