@@ -1,8 +1,9 @@
 package test
 
 import (
-	"concrete-quad/engine/pcs/quadtree"
 	"testing"
+
+	"github.com/therealbytes/quadrosol/engine/pcs/quadtree"
 )
 
 func TestQuadTreeMerkle(t *testing.T) {

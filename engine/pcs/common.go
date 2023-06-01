@@ -1,8 +1,9 @@
 package pcs
 
 import (
-	"concrete-quad/engine/pcs/quadtree"
 	"math/big"
+
+	"github.com/therealbytes/quadrosol/engine/pcs/quadtree"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"

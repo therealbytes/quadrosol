@@ -1,9 +1,6 @@
 package main
 
 import (
-	"concrete-quad/engine/pcs"
-	"concrete-quad/engine/pcs/quadtree"
-	pcs_test "concrete-quad/engine/pcs/test"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -13,6 +10,10 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	"github.com/therealbytes/quadrosol/engine/pcs"
+	"github.com/therealbytes/quadrosol/engine/pcs/quadtree"
+	pcs_test "github.com/therealbytes/quadrosol/engine/pcs/test"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"

@@ -1,8 +1,9 @@
 package main
 
 import (
-	"concrete-quad/engine/pcs"
 	_ "embed"
+
+	"github.com/therealbytes/quadrosol/engine/pcs"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/concrete"

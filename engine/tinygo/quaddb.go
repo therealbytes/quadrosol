@@ -1,7 +1,7 @@
 package main
 
 import (
-	"concrete-quad/engine/pcs"
+	"github.com/therealbytes/quadrosol/engine/pcs"
 
 	"github.com/ethereum/go-ethereum/tinygo"
 )

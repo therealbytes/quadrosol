@@ -1,10 +1,11 @@
 package test
 
 import (
-	"concrete-quad/engine/pcs"
-	"concrete-quad/engine/pcs/quadtree"
 	_ "embed"
 	"testing"
+
+	"github.com/therealbytes/quadrosol/engine/pcs"
+	"github.com/therealbytes/quadrosol/engine/pcs/quadtree"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/concrete/contracts"

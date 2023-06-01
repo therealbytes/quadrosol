@@ -2,8 +2,9 @@ package test
 
 import (
 	"bytes"
-	"concrete-quad/engine/pcs"
-	"concrete-quad/engine/pcs/quadtree"
+
+	"github.com/therealbytes/quadrosol/engine/pcs"
+	"github.com/therealbytes/quadrosol/engine/pcs/quadtree"
 
 	"github.com/ethereum/go-ethereum/common"
 	cc_api "github.com/ethereum/go-ethereum/concrete/api"
